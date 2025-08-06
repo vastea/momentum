@@ -23,3 +23,9 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
+# 用于操作 SQLite 数据库
+rusqlite = { version = "0.37.0", features = ["bundled"] }
+# 用于处理时间和日期
+chrono = { version = "0.4", features = ["serde"] }
+# 用于提供更方便、更强大的错误处理
+anyhow = "1.0"
