@@ -1,8 +1,8 @@
 [package]
 name = "momentum"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Momentum: An open-source desktop to-do app for keyboard-centric users."
+authors = ["vastea"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -29,3 +29,4 @@ rusqlite = { version = "0.37.0", features = ["bundled"] }
 chrono = { version = "0.4", features = ["serde"] }
 # 用于提供更方便、更强大的错误处理
 anyhow = "1.0"
+thiserror = "2.0"
