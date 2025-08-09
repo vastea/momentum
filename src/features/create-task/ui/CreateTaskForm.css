@@ -1,0 +1,44 @@
+/* src/features/create-task/ui/CreateTaskForm.css */
+.create-task-form {
+    display: flex;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.task-input {
+    flex-grow: 1;
+    padding: 10px 14px;
+    font-size: 16px;
+    border: 1px solid #444;
+    border-radius: 6px 0 0 6px;
+    background-color: #222;
+    color: #fff;
+}
+
+.task-input:focus {
+    outline: none;
+    border-color: #6c5ce7;
+}
+
+.submit-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 1px solid #6c5ce7;
+    border-left: none;
+    background-color: #6c5ce7;
+    color: white;
+    cursor: pointer;
+    border-radius: 0 6px 6px 0;
+    transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+    background-color: #5849d1;
+}
+
+.submit-button:disabled {
+    background-color: #444;
+    border-color: #444;
+    cursor: not-allowed;
+}

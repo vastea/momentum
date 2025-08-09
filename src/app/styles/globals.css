@@ -1,7 +1,15 @@
 /* src/app/styles/globals.css */
 
+@font-face {
+    font-family: 'Momentum Font';
+    /* 修正1：更新 src 路径以匹配您使用的可变字体文件名 */
+    src: url('../../assets/fonts/NotoSansSC-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Momentum Font', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
 
@@ -14,6 +22,20 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+/* 修正2：为所有主要的表单元素添加这条新规则 */
+input,
+button,
+textarea,
+select {
+    /* `font-family: inherit;` 是关键！
+     它强制这些元素放弃自己的默认字体，
+     并从它们的父元素那里继承字体，也就是全局设置的 'Momentum Font'。*/
+    font-family: inherit;
+    font-size: inherit;
+    /* 同时建议继承字号以保持一致性 */
+}
+
 
 body {
     margin: 0;

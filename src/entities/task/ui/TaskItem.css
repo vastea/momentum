@@ -1,0 +1,51 @@
+/* src/entities/task/ui/TaskItem.css */
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #333;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.task-checkbox {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+}
+
+.task-title {
+    flex-grow: 1;
+    /* 让标题占据所有可用空间 */
+    font-size: 16px;
+    transition: color 0.2s ease;
+}
+
+.task-title.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.delete-button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+    opacity: 0;
+    /* 默认隐藏 */
+    transition: opacity 0.2s ease;
+}
+
+/* 当鼠标悬停在任务项上时，显示删除按钮 */
+.task-item:hover .delete-button {
+    opacity: 1;
+}
+
+.delete-button:hover {
+    color: #ff6b6b;
+}
