@@ -6,6 +6,7 @@ use momentum_lib::{
     error::Result,
 };
 use tauri::Manager;
+use momentum_lib::app::commands::project_commands;
 
 fn main() -> Result<()> {
     // 使用 `tauri::Builder` 来构建应用。
@@ -24,10 +25,17 @@ fn main() -> Result<()> {
         // `.invoke_handler()` 负责注册所有想要从前端调用的 Rust 函数。
         // `generate_handler!` 宏会自动收集所有列出的、标记为 `#[tauri::command]` 的函数。
         .invoke_handler(tauri::generate_handler![
+            // 任务相关的指令
             task_commands::create_task,
             task_commands::get_all_tasks,
             task_commands::update_task_status,
-            task_commands::delete_task
+            task_commands::delete_task,
+
+            // 新增：项目相关的指令
+            project_commands::create_project,
+            project_commands::get_all_projects,
+            project_commands::update_project,
+            project_commands::delete_project
         ])
         // `.run()` 启动事件循环并显示窗口，这是最后一步。
         .run(tauri::generate_context!())

@@ -4,6 +4,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
 import type { Task } from "../../../entities/task/model/types";
 
+// 定义 mutation 函数接收的参数类型
+type CreateTaskPayload = {
+    title: string;
+    projectId: number | null; // projectId 可以是 null
+};
+
 /**
  * @description useCreateTask 是一个用于创建新任务的自定义 React Hook。
  * 它封装了 `useMutation` 的逻辑。
@@ -14,14 +20,18 @@ export function useCreateTask() {
     const queryClient = useQueryClient();
 
     // `useMutation` 用于执行会改变后端数据的操作。
-    const mutation = useMutation({
+    return useMutation({
         /**
          * @property mutationFn: 一个执行数据变更的异步函数。
-         * 它接收一个变量（在这里是新任务的 `title`），
+         * 接收一个包含 title 和 projectId 的对象,
          * 然后调用后端的 `create_task` 指令。
-         * 将 `title` 包装在一个对象中以匹配 Tauri指令的参数格式。
+         * 将此对象包装在一个对象中以匹配 Tauri指令的参数格式。
          */
-        mutationFn: (title: string) => invoke<Task>("create_task", { title }),
+        mutationFn: (payload: CreateTaskPayload) =>
+            invoke<Task>("create_task", {
+                title: payload.title,
+                projectId: payload.projectId, // 将 projectId 传递给后端
+            }),
 
         /**
          * @property onSuccess: 一个在 mutationFn 成功执行后触发的回调函数。
@@ -35,6 +45,4 @@ export function useCreateTask() {
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
         },
     });
-
-    return mutation;
 }

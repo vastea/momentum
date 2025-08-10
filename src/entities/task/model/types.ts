@@ -25,6 +25,13 @@ export type Task = {
     is_completed: boolean;
 
     /**
+     * @description 新增：任务所属项目的ID。
+     * 如果任务不属于任何项目，则该值为 null。
+     * 这需要与我们数据库中的 `project_id INTEGER` (可为NULL) 字段相对应。
+     */
+    project_id: number | null;
+
+    /**
      * @description 任务的创建时间。
      * 对应 Rust 的 `DateTime<Utc>`。
      * @note 在从后端序列化为 JSON 后，`DateTime<Utc>` 类型会转换为 ISO 8601 格式的字符串。

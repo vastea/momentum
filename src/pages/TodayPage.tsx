@@ -2,6 +2,7 @@
 
 import { CreateTaskForm } from "../features/create-task/ui/CreateTaskForm";
 import { TaskList } from "../widgets/task-list/TaskList";
+import { ProjectList } from "../widgets/project-list/ProjectList";
 import './TodayPage.css';
 
 /**
@@ -10,13 +11,18 @@ import './TodayPage.css';
  */
 export function TodayPage() {
     return (
-        // 使用一个主容器来控制整体布局
-        <main className="today-page-container">
-            {/* 在页面顶部，放置创建新任务的表单 */}
-            <CreateTaskForm />
+        // 主容器是左右布局
+        <div className="page-layout">
+            {/* 侧边栏区域 */}
+            <aside className="sidebar">
+                <ProjectList />
+            </aside>
 
-            {/* 在表单下方，放置显示所有任务的列表 */}
-            <TaskList />
-        </main>
+            {/* 主内容区域 */}
+            <main className="main-content">
+                <CreateTaskForm />
+                <TaskList />
+            </main>
+        </div>
     );
 }

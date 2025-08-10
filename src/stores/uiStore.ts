@@ -1,0 +1,19 @@
+import { create } from 'zustand';
+
+// 定义状态的接口
+interface UiState {
+    // 当前选中的项目ID，可以为 null（表示未选择任何项目，例如“收件箱”）
+    selectedProjectId: number | null;
+    // 定义一个可以修改状态的“动作” (Action)
+    setSelectedProjectId: (projectId: number | null) => void;
+}
+
+/**
+ * 创建一个用于管理全局 UI 状态的 Zustand store
+ */
+export const useUiStore = create<UiState>((set) => ({
+    // 初始状态下，没有选中任何项目
+    selectedProjectId: null,
+    // 当调用这个函数时，它会使用新的 projectId 来更新状态
+    setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
+}));

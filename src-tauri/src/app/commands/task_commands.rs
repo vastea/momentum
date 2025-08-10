@@ -8,8 +8,10 @@ use crate::error::Result;
 #[tauri::command]
 pub async fn create_task(
     title: String,                     // 这个参数 `title` 将由前端调用时以 JSON 格式传递。
+    project_id: Option<i64>,           // project_id 参数，用于和 project 做关联
     state: tauri::State<'_, AppState>, // 通过 `tauri::State` 类型声明，Tauri 会自动注入之前 manage 的共享状态。
 ) -> Result<Task> {
+    println!("接收到创建任务的请求，标题为: {}, 项目ID为: {:?}", title, project_id);
     // 从共享状态中获取数据库连接。
     // `.lock().unwrap()` 用于获取互斥锁的访问权限，确保线程安全。
     // `.unwrap()` 在这里是安全的，因为如果锁被“毒化”（持有锁的线程崩溃了），希望程序直接恐慌。
@@ -17,7 +19,7 @@ pub async fn create_task(
 
     // 调用之前编写的、与数据库直接交互的函数来执行真正的数据库操作。
     // `?` 操作符用于错误传播，如果 `create_task` 返回一个错误，它会立即从当前函数返回。
-    let new_task = task_queries::create_task(&conn, &title)?;
+    let new_task = task_queries::create_task(&conn, &title, project_id)?;
 
     // 返回一个 `Ok(new_task)`，Tauri 会自动将 `new_task` 序列化为 JSON 并通过 `resolve` 返回给前端的 Promise。
     // 如果返回 `Err(...)`，Tauri 会通过 `reject` 将错误信息返回。
@@ -25,9 +27,13 @@ pub async fn create_task(
 }
 
 #[tauri::command]
-pub async fn get_all_tasks(state: tauri::State<'_, AppState>) -> Result<Vec<Task>> {
+pub async fn get_all_tasks(
+    project_id: Option<i64>,
+    state: tauri::State<'_, AppState>
+) -> Result<Vec<Task>> {
     let conn = state.db.lock().unwrap();
-    let tasks = task_queries::get_all_tasks(&conn)?;
+    // 将接收到的 project_id 传递给查询函数
+    let tasks = task_queries::get_all_tasks(&conn, project_id)?;
     Ok(tasks)
 }
 

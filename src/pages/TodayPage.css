@@ -1,15 +1,28 @@
-/* src/pages/TodayPage.css */
+.page-layout {
+    display: flex;
+    flex-direction: row; /* 设置为水平排列 */
+    width: 100vw; /* 占满视口宽度 */
+    height: 100vh; /* 占满视口高度 */
+    overflow: hidden; /* 防止内部滚动条影响布局 */
+}
 
-.today-page-container {
+.sidebar {
+    width: 280px; /* 侧边栏固定宽度 */
+    background-color: #1e1e1e; /* 给侧边栏一个稍暗的背景色以作区分 */
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    /* 让子元素垂直排列 */
+}
+
+.main-content {
+    flex-grow: 1; /* 主内容区占据所有剩余空间 */
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    /* 水平居中 */
-    width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    /* 让 padding 不会撑大容器宽度 */
-    height: 100vh;
-    /* 占满整个视口高度 */
+    height: 100%;
+    overflow-y: auto; /* 如果任务列表过长，允许主内容区滚动 */
 }

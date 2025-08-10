@@ -1,0 +1,51 @@
+.project-list-widget {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    /* 确保这个 widget 占满其父容器（侧边栏）的全部高度 */
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.widget-title {
+    font-size: 18px;
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #444;
+    /* 防止标题在 flex 布局中被压缩 */
+    flex-shrink: 0;
+}
+
+.project-list-container {
+    /* 让这个容器占据所有可用的剩余空间 */
+    flex-grow: 1;
+    overflow-y: auto;
+    /* 一个 flexbox 的小技巧，防止在某些情况下内容溢出 */
+    min-height: 0;
+}
+
+.inbox {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 12px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.inbox.selected {
+    background-color: #4a4a4a;
+}
+
+.inbox:hover {
+    background-color: #3a3a3a;
+}
+
+.divider {
+    height: 1px;
+    background-color: #444;
+    margin: 8px 0;
+    flex-shrink: 0;
+}

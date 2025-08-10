@@ -5,12 +5,15 @@ import { useCreateTask } from "../api/useCreateTask";
 import { Input } from "../../../shared/ui/Input"; // 引入共享的 Input 组件
 import { Button } from "../../../shared/ui/Button"; // 引入共享的 Button 组件
 import './CreateTaskForm.css';
+import { useUiStore } from "../../../stores/uiStore"; // 引入 UI store
 
 export function CreateTaskForm() {
     // 使用 React 的 useState 来管理输入框的当前值。
     const [title, setTitle] = useState("");
     // 调用 useCreateTask Hook，获取执行创建操作的 `mutate` 函数。
     const { mutate: createTask, isPending } = useCreateTask();
+    // 从 store 中获取当前选中的项目ID
+    const selectedProjectId = useUiStore((state) => state.selectedProjectId);
 
     /**
      * 表单提交时的处理函数
@@ -22,7 +25,8 @@ export function CreateTaskForm() {
         if (!title.trim() || isPending) return;
 
         // 调用 mutate 函数，将当前输入框的标题作为参数传给后端。
-        createTask(title, {
+        createTask({title, projectId: selectedProjectId },
+            {
             // 在成功回调中，清空输入框。
             onSuccess: () => {
                 setTitle("");
