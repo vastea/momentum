@@ -1,5 +1,3 @@
-/* src/entities/task/ui/TaskItem.css */
-
 .task-item {
     display: flex;
     align-items: center;
@@ -48,4 +46,16 @@
 
 .delete-button:hover {
     color: #ff6b6b;
+}
+
+.task-content {
+    flex-grow: 1;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.subtask-indicator {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
 }

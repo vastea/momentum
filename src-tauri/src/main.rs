@@ -27,9 +27,10 @@ fn main() -> Result<()> {
         .invoke_handler(tauri::generate_handler![
             // 任务相关的指令
             task_commands::create_task,
-            task_commands::get_all_tasks,
+            task_commands::get_tasks_by_parent,
             task_commands::update_task_status,
             task_commands::delete_task,
+            task_commands::get_task_by_id,
 
             // 新增：项目相关的指令
             project_commands::create_project,

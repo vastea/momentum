@@ -1,5 +1,3 @@
-// src/features/create-task/api/useCreateTask.ts
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
 import type { Task } from "../../../entities/task/model/types";
@@ -8,6 +6,7 @@ import type { Task } from "../../../entities/task/model/types";
 type CreateTaskPayload = {
     title: string;
     projectId: number | null; // projectId 可以是 null
+    parentId: number | null;
 };
 
 /**
@@ -31,6 +30,7 @@ export function useCreateTask() {
             invoke<Task>("create_task", {
                 title: payload.title,
                 projectId: payload.projectId, // 将 projectId 传递给后端
+                parentId: payload.parentId, // 传递 parentId
             }),
 
         /**

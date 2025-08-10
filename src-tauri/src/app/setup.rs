@@ -46,9 +46,11 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
             title           TEXT NOT NULL, -- 任务标题，不允许为空
             is_completed    INTEGER NOT NULL DEFAULT 0, -- 完成状态，0代表false，1代表true
             project_id      INTEGER, -- 项目id，用于关联项目
+            parent_id       INTEGER, -- 父任务id，用于父子任务关联
             created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')), -- 创建时间
             updated_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),  -- 更新时间
-            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+            FOREIGN KEY (parent_id) REFERENCES tasks(id) ON DELETE CASCADE
         );
         ",
     )?;

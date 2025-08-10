@@ -1,35 +1,35 @@
-// src/widgets/task-list/TaskList.tsx
-
-import { useTasks } from "../../entities/task/api/useTasks";
+import { useTasksByParent } from "../../entities/task/api/useTasks";
 import { TaskItem } from "../../entities/task/ui/TaskItem";
+import { useUiStore } from "../../stores/uiStore";
+import { TaskDetailView } from "../task-detail-view/TaskDetailView";
 import './TaskList.css';
 
 export function TaskList() {
-    // 调用之前创建的 useTasks Hook 来获取数据。
-    // TanStack Query 为返回了所有需要的数据和状态。
-    const { data: tasks, isLoading, isError, error } = useTasks();
+    const { selectedProjectId, viewingTaskId } = useUiStore();
 
-    // 当数据还在加载时，显示一个提示信息。
-    if (isLoading) {
-        return <div>正在加载任务...</div>;
+    // 在任务列表视图中，获取的是顶级任务 (parentId: null)，
+    // 并根据当前选中的项目 (selectedProjectId) 进行筛选。
+    const { data: tasks, isLoading, isError, error } = useTasksByParent({
+        projectId: selectedProjectId,
+        parentId: null, // 只获取顶级任务
+    });
+
+    if (viewingTaskId) {
+        return <TaskDetailView taskId={viewingTaskId} />;
     }
 
-    // 当发生错误时，显示错误信息。
     if (isError) {
         return <div>加载任务失败: {error.message}</div>;
     }
 
-    // 当数据成功加载后，渲染任务列表。
     return (
         <div className="task-list-container">
-            {/* 检查 tasks 是否为空或长度为0 */}
             {tasks && tasks.length > 0 ? (
-                // 使用 .map() 遍历任务数组，为每个任务渲染一个 TaskItem 组件。
-                // `key` 是 React 在渲染列表时用于优化的必需属性，使用任务的唯一 id。
                 tasks.map((task) => <TaskItem key={task.id} task={task} />)
             ) : (
-                // 如果没有任务，显示一个提示信息。
-                <div className="empty-state">太棒了，所有任务都已完成！</div>
+                <div className="empty-state">
+                    {isLoading ? "正在加载任务..." : "这个列表还没有任务！"}
+                </div>
             )}
         </div>
     );

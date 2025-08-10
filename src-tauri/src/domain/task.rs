@@ -14,9 +14,19 @@ pub struct Task {
 
      /// 任务所属项目的 ID。
      // 使用 `Option<i64>` 类型来表示这个字段。
-     // `Some(project_id)`: 代表任务属于某个项目。
-     // `None`: 代表任务不属于任何项目（对应数据库中的 NULL）。
+     // - `Some(project_id)`: 代表任务属于某个项目。
+     // - `None`: 代表任务不属于任何项目（对应数据库中的 NULL）。
     pub project_id: Option<i64>,
+
+    /// 父任务的ID。
+    // 使用 `Option<i64>` 类型来表示这个字段。
+    // - `Some(parent_id)`: 代表这是一个子任务。
+    // - `None`: 代表这是一个顶层任务（父任务），对应数据库中的 NULL。
+    pub parent_id: Option<i64>,
+
+    // 子任务的数量。
+    // 这个字段不存在于数据库表中，而是通过 SQL 查询动态计算出来的。
+    pub subtask_count: i64,
 
     /// 使用 `chrono` 的 `DateTime<Utc>` 来确保所有时间戳都使用统一的世界协调时（UTC）。
     /// 这是处理时间的最佳实践，可以避免因用户本地时区不同而导致的数据混乱。

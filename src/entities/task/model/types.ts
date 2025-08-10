@@ -1,5 +1,3 @@
-// src/entities/task/model/types.ts
-
 /**
  * @description 代表一个任务的核心数据结构。
  * 这个类型定义与 Rust 后端的 `domain::task::Task` 结构体严格对应。
@@ -25,11 +23,28 @@ export type Task = {
     is_completed: boolean;
 
     /**
-     * @description 新增：任务所属项目的ID。
+     * @description 任务所属项目的ID。
      * 如果任务不属于任何项目，则该值为 null。
-     * 这需要与我们数据库中的 `project_id INTEGER` (可为NULL) 字段相对应。
+     * 这需要与数据库中的 `project_id INTEGER` (可为NULL) 字段相对应。
      */
     project_id: number | null;
+
+    /**
+     * @description 父任务的 ID。
+     * 如果为 null，则表示这是一个顶层任务。
+     */
+    parent_id: number | null;
+
+    /**
+     * @description 该任务包含的子任务数量。
+     */
+    subtask_count: number;
+
+    /**
+     * @description 用于在前端存放子任务列表。
+     * 这个字段用于在从后端获取数据时不存在，在前端手动填充。
+     */
+    subtasks?: Task[];
 
     /**
      * @description 任务的创建时间。
