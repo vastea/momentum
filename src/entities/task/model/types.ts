@@ -1,3 +1,6 @@
+// 定义 Priority 类型，与后端枚举的成员名完全对应
+export type Priority = "None" | "Low" | "Medium" | "High";
+
 /**
  * @description 代表一个任务的核心数据结构。
  * 这个类型定义与 Rust 后端的 `domain::task::Task` 结构体严格对应。
@@ -39,6 +42,12 @@ export type Task = {
      * @description 该任务包含的子任务数量。
      */
     subtask_count: number;
+
+    /**
+     * @description 任务的优先级。
+     * 类型是定义的 Priority。
+     */
+    priority: Priority;
 
     /**
      * @description 用于在前端存放子任务列表。

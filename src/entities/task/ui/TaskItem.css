@@ -59,3 +59,20 @@
     color: #888;
     margin-top: 2px;
 }
+
+/* 默认边框样式 */
+.task-item {
+    border-left: 3px solid transparent; /* 默认是透明的 */
+    transition: border-left-color 0.3s ease;
+}
+
+/* 根据优先级设置不同的左边框颜色 */
+.task-item.priority-border-low {
+    border-left-color: #2e86de;
+}
+.task-item.priority-border-medium {
+    border-left-color: #f39c12;
+}
+.task-item.priority-border-high {
+    border-left-color: #e74c3c;
+}

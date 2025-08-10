@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc}; // 引入 `chrono` 库来处理与时区无关的时间。
-use serde::Serialize; // 引入 `serde` 的 `Serialize` Trait，用于将结构体序列化为 JSON。
+use serde::Serialize;
+use crate::domain::priority::Priority;
+// 引入 `serde` 的 `Serialize` Trait，用于将结构体序列化为 JSON。
 
 /// 核心业务模型：任务
 /// 它代表了一个待办事项的完整信息，是领域驱动设计（DDD）中的“领域对象”。
@@ -27,6 +29,9 @@ pub struct Task {
     // 子任务的数量。
     // 这个字段不存在于数据库表中，而是通过 SQL 查询动态计算出来的。
     pub subtask_count: i64,
+
+    /// 优先级
+    pub priority: Priority,
 
     /// 使用 `chrono` 的 `DateTime<Utc>` 来确保所有时间戳都使用统一的世界协调时（UTC）。
     /// 这是处理时间的最佳实践，可以避免因用户本地时区不同而导致的数据混乱。

@@ -1,5 +1,6 @@
 use crate::app::state::AppState;
 use crate::db::queries::task_queries;
+use crate::domain::priority::Priority;
 use crate::domain::task::Task;
 use crate::error::Result;
 
@@ -66,4 +67,19 @@ pub async fn get_task_by_id(id: i64, state: tauri::State<'_, AppState>) -> Resul
     let conn = state.db.lock().unwrap();
     let task = task_queries::get_task_by_id(&conn, id)?;
     Ok(task)
+}
+
+/// Tauri 指令，用于更新一个任务的优先级
+#[tauri::command]
+pub async fn update_task_priority(
+    id: i64,
+    priority: Priority, // 前端将直接发送 "High", "Medium" 等字符串
+    state: tauri::State<'_, AppState>,
+) -> Result<()> { // 成功时无需返回数据
+    // 得益于为 Priority 枚举实现的 `serde::Deserialize`，
+    // Tauri 会自动将前端发来的 JSON 字符串 ("High") 解析为 Priority::High 枚举成员。
+    let conn = state.db.lock().unwrap();
+    // 调用刚刚创建的数据库查询函数
+    task_queries::update_task_priority(&conn, id, priority)?;
+    Ok(())
 }

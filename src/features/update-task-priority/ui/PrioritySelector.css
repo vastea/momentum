@@ -1,0 +1,29 @@
+.priority-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 8px;
+    transition: transform 0.1s ease;
+}
+
+.priority-selector:hover {
+    transform: scale(1.1);
+}
+
+/* 根据不同的优先级，显示不同的颜色 */
+.priority-selector.priority-none svg {
+    color: #555; /* 无优先级 - 灰色 */
+}
+.priority-selector.priority-low svg {
+    color: #2e86de; /* 低优先级 - 蓝色 */
+}
+.priority-selector.priority-medium svg {
+    color: #f39c12; /* 中优先级 - 橙色 */
+}
+.priority-selector.priority-high svg {
+    color: #e74c3c; /* 高优先级 - 红色 */
+}

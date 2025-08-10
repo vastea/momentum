@@ -31,6 +31,7 @@ fn main() -> Result<()> {
             task_commands::update_task_status,
             task_commands::delete_task,
             task_commands::get_task_by_id,
+            task_commands::update_task_priority,
 
             // 新增：项目相关的指令
             project_commands::create_project,

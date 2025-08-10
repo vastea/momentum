@@ -1,3 +1,4 @@
+use crate::domain::priority::Priority;
 use crate::domain::task::Task;
 use chrono::NaiveDateTime;
 use rusqlite::{params, Connection, Result as SqliteResult, ToSql};
@@ -25,7 +26,9 @@ pub fn get_tasks_by_parent(
     parent_id: Option<i64>,
 ) -> SqliteResult<Vec<Task>> {
     let mut sql =
-        "SELECT id, title, is_completed, project_id, parent_id, created_at, updated_at, (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count FROM tasks"
+        "SELECT id, title, is_completed, project_id, parent_id, priority, created_at, updated_at, \
+        (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
+        FROM tasks"
             .to_string();
 
     let mut params_vec: Vec<Box<dyn ToSql>> = Vec::new();
@@ -48,8 +51,9 @@ pub fn get_tasks_by_parent(
         }
     }
 
-    sql.push_str(" ORDER BY created_at DESC");
-
+    // 首先按 `priority` 降序（DESC）排列，这样 3(高) > 2(中) > 1(低) > 0(无)
+    // 对于优先级相同的任务，再按 `created_at` 降序排列，确保新任务在前
+    sql.push_str(" ORDER BY priority DESC, created_at DESC");
     let mut stmt = conn.prepare(&sql)?;
 
     // 使用 `rusqlite::params_from_iter` 将 Vec 转换为 `rusqlite` 可接受的参数类型
@@ -58,6 +62,7 @@ pub fn get_tasks_by_parent(
     let task_iter = stmt.query_map(params_slice, |row| {
         let created_at_str: String = row.get("created_at")?;
         let updated_at_str: String = row.get("updated_at")?;
+        let priority_val: i64 = row.get("priority")?;
 
         Ok(Task {
             id: row.get("id")?,
@@ -66,6 +71,7 @@ pub fn get_tasks_by_parent(
             project_id: row.get("project_id")?,
             parent_id: row.get("parent_id")?,
             subtask_count: row.get("subtask_count")?,
+            priority: priority_val.into(),
             created_at: NaiveDateTime::parse_from_str(&created_at_str, "%Y-%m-%d %H:%M:%S")
                 .unwrap()
                 .and_utc(),
@@ -91,10 +97,15 @@ pub fn delete_task(conn: &Connection, id: i64) -> SqliteResult<usize> {
 
 /// 这是一个内部辅助函数，不对外暴露，仅用于根据 ID 获取单个任务。
 pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
-    let sql = "SELECT id, title, is_completed, project_id, parent_id, created_at, updated_at, (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count FROM tasks WHERE id = ?";
+    let sql =
+        "SELECT id, title, is_completed, project_id, parent_id, priority, created_at, updated_at, \
+        (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
+        FROM tasks \
+        WHERE id = ?";
     conn.query_row(sql, params![id], |row| {
         let created_at_str: String = row.get("created_at")?;
         let updated_at_str: String = row.get("updated_at")?;
+        let priority_val: i64 = row.get("priority")?;
 
         Ok(Task {
             id: row.get("id")?,
@@ -103,6 +114,7 @@ pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
             project_id: row.get("project_id")?,
             parent_id: row.get("parent_id")?,
             subtask_count: row.get("subtask_count")?,
+            priority: priority_val.into(),
             created_at: NaiveDateTime::parse_from_str(&created_at_str, "%Y-%m-%d %H:%M:%S")
                 .unwrap()
                 .and_utc(),
@@ -112,3 +124,13 @@ pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
         })
     })
 }
+
+/// 用于更新任务优先级的函数
+pub fn update_task_priority(conn: &Connection, id: i64, priority: Priority) -> SqliteResult<usize> {
+    let sql = "UPDATE tasks SET priority = ?1, updated_at = strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime') \
+    WHERE id = ?2";
+
+    // 将 Priority 枚举转换为 i64 存入数据库。
+    // `priority.into()` 会自动调用为 Priority 实现的 From<Priority> for i64 Trait。
+    let priority_as_i64: i64 = priority.into();
+    conn.execute(sql, params![priority_as_i64, id])}

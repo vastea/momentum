@@ -2,7 +2,8 @@ import type { Task } from "../model/types";
 import { useUpdateTaskStatus } from "../../../features/update-task/api/useUpdateTaskStatus";
 import { useDeleteTask } from "../../../features/delete-task/api/useDeleteTask";
 import './TaskItem.css';
-import {useUiStore} from "../../../stores/uiStore.ts"; // 将为组件添加一些样式
+import {useUiStore} from "../../../stores/uiStore.ts";
+import {PrioritySelector} from "../../../features/update-task-priority/ui/PrioritySelector.tsx"; // 将为组件添加一些样式
 
 interface TaskItemProps {
     /**
@@ -34,13 +35,16 @@ export function TaskItem({ task }: TaskItemProps) {
     };
 
     return (
-        <div className="task-item">
+        // 根据任务的优先级，为整个任务项添加一个边框颜色提示
+        <div className={`task-item priority-border-${task.priority.toLowerCase()}`}>
             <input
                 type="checkbox"
                 checked={task.is_completed}
                 onChange={handleToggleComplete}
                 className="task-checkbox"
             />
+            {/* 在复选框和标题之间，添加优先级选择器 */}
+            <PrioritySelector task={task} />
             {/* 将标题包裹在一个可点击的 div 中 */}
             <div className="task-content" onClick={() => setViewingTaskId(task.id)}>
                 <span className={`task-title ${task.is_completed ? "completed" : ""}`}>
