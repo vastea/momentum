@@ -32,13 +32,23 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
            这极大地提高了数据库的并发性能，允许读和写同时进行而不会互相阻塞。*/
         PRAGMA journal_mode = WAL;
 
+        /* 创建 projects 表，`IF NOT EXISTS` 确保了这条语句只在表不存在时执行，可以安全地重复运行。*/
+        CREATE TABLE IF NOT EXISTS projects (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            name            TEXT NOT NULL UNIQUE,
+            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+            updated_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))
+        );
+
         /* 创建 tasks 表，`IF NOT EXISTS` 确保了这条语句只在表不存在时执行，可以安全地重复运行。*/
         CREATE TABLE IF NOT EXISTS tasks (
             id              INTEGER PRIMARY KEY AUTOINCREMENT, -- 自增主键
             title           TEXT NOT NULL, -- 任务标题，不允许为空
             is_completed    INTEGER NOT NULL DEFAULT 0, -- 完成状态，0代表false，1代表true
+            project_id      INTEGER, -- 项目id，用于关联项目
             created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')), -- 创建时间
-            updated_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))  -- 更新时间
+            updated_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),  -- 更新时间
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL
         );
         ",
     )?;
