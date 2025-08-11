@@ -1,12 +1,12 @@
 // 在非调试模式下（即发布版），禁用 Windows 系统上的命令行窗口。
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use momentum_lib::app::commands::project_commands;
 use momentum_lib::{
     app::{self, commands::task_commands},
     error::Result,
 };
 use tauri::Manager;
-use momentum_lib::app::commands::project_commands;
 
 fn main() -> Result<()> {
     // 使用 `tauri::Builder` 来构建应用。
@@ -32,7 +32,7 @@ fn main() -> Result<()> {
             task_commands::delete_task,
             task_commands::get_task_by_id,
             task_commands::update_task_priority,
-
+            task_commands::update_task_due_date,
             // 新增：项目相关的指令
             project_commands::create_project,
             project_commands::get_all_projects,

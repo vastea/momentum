@@ -1,22 +1,31 @@
 import type { Task } from "../model/types";
 import { useUpdateTaskStatus } from "../../../features/update-task/api/useUpdateTaskStatus";
 import { useDeleteTask } from "../../../features/delete-task/api/useDeleteTask";
+import { useUiStore } from "../../../stores/uiStore.ts";
+import { PrioritySelector } from "../../../features/update-task-priority/ui/PrioritySelector.tsx"; // 将为组件添加一些样式
+import { useUpdateTaskDueDate } from "../../../features/update-task-due-date/api/useUpdateTaskDueDate";
+import { useState } from "react";
+import { DatePicker } from "../../../shared/ui/DatePicker/DatePicker"; // 引入新组件
+import { Calendar, Folder, GitCommitHorizontal } from "lucide-react";
 import './TaskItem.css';
-import {useUiStore} from "../../../stores/uiStore.ts";
-import {PrioritySelector} from "../../../features/update-task-priority/ui/PrioritySelector.tsx"; // 将为组件添加一些样式
+import { formatDueDate } from "../../../shared/lib/dateUtils.ts";
 
 interface TaskItemProps {
     /**
      * @property task: 组件接收的单个任务对象
      */
     task: Task;
+    projectName?: string;
 }
 
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task, projectName }: TaskItemProps) {
     // 在组件内部调用刚刚创建的 Hooks，获取执行 mutation 的能力
     const { mutate: updateStatus } = useUpdateTaskStatus();
     const { mutate: deleteTask } = useDeleteTask();
+    const { mutate: updateDueDate } = useUpdateTaskDueDate();
     const setViewingTaskId = useUiStore((state) => state.setViewingTaskId);
+    const [isDatePickerOpen, setDatePickerOpen] = useState(false); // 新增状态控制弹窗
+
 
     /**
      * 当复选框状态改变时调用的处理函数
@@ -34,32 +43,77 @@ export function TaskItem({ task }: TaskItemProps) {
         deleteTask(task.id);
     };
 
+    // 当日期选择器的值改变时触发
+    const handleDateChange = (date: Date | undefined) => {
+        // `date` 已经是包含完整日期和时间的对象，或者 undefined
+        updateDueDate({
+            id: task.id,
+            dueDate: date ? date.toISOString() : null
+        });
+        setDatePickerOpen(false); // 选择后关闭弹窗
+    };
+
     return (
-        // 根据任务的优先级，为整个任务项添加一个边框颜色提示
-        <div className={`task-item priority-border-${task.priority.toLowerCase()}`}>
-            <input
-                type="checkbox"
-                checked={task.is_completed}
-                onChange={handleToggleComplete}
-                className="task-checkbox"
-            />
-            {/* 在复选框和标题之间，添加优先级选择器 */}
-            <PrioritySelector task={task} />
-            {/* 将标题包裹在一个可点击的 div 中 */}
-            <div className="task-content" onClick={() => setViewingTaskId(task.id)}>
-                <span className={`task-title ${task.is_completed ? "completed" : ""}`}>
-                  {task.title}
-                </span>
-                {/* 如果有子任务，就显示指示器 */}
-                {task.subtask_count > 0 && (
-                    <div className="subtask-indicator">
-                        {task.subtask_count} 个子任务
+        <>
+            <div className={`task-item priority-border-${task.priority.toLowerCase()}`}>
+                <div className="task-main-content">
+                    {/* --- 任务完成情况勾选框 --- */}
+                    <input
+                        type="checkbox"
+                        checked={task.is_completed}
+                        onChange={handleToggleComplete}
+                        className="task-checkbox"
+                    />
+                    {/* --- 任务优先级 --- */}
+                    <PrioritySelector task={task} />
+                    {/* --- 任务标题 --- */}
+                    <span
+                        className={`task-title ${task.is_completed ? "completed" : ""}`}
+                        onClick={() => setViewingTaskId(task.id)}
+                    >
+                        {task.title}
+                    </span>
+                    {/* --- 删除按钮 --- */}
+                    <button onClick={handleDelete} className="delete-button">&times;</button>
+                </div>
+                {/* --- 元数据行 --- */}
+                <div className="task-metadata">
+                    {/* 截止日期 */}
+                    <div className="metadata-item due-date" onClick={() => setDatePickerOpen(true)}>
+                        <Calendar size={14} />
+                        <span data-has-date={!!task.due_date}>
+                            {task.due_date ? formatDueDate(task.due_date) : '添加截止日期'}
+                        </span>
                     </div>
-                )}
+
+                    {/* 子任务数量 */}
+                    {task.subtask_count > 0 && (
+                        <div className="metadata-item subtask-indicator">
+                            <GitCommitHorizontal size={14} />
+                            <span>{task.subtask_count}</span>
+                        </div>
+                    )}
+
+                    {/* 项目名称 */}
+                    {projectName && (
+                        <div className="metadata-item project-indicator">
+                            <Folder size={14} />
+                            <span>{projectName}</span>
+                        </div>
+                    )}
+                </div>
             </div>
-            <button onClick={handleDelete} className="delete-button">
-                &times; {/* HTML 的乘号实体，作为删除图标 */}
-            </button>
-        </div>
+
+            {/* 条件渲染 DatePicker 弹窗 */}
+            {
+                isDatePickerOpen && (
+                    <DatePicker
+                        value={task.due_date ? new Date(task.due_date) : null}
+                        onChange={handleDateChange}
+                        onClose={() => setDatePickerOpen(false)}
+                    />
+                )
+            }
+        </>
     );
 }

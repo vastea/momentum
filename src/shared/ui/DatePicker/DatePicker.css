@@ -1,0 +1,80 @@
+@import 'react-day-picker/dist/style.css';
+
+.date-picker-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.date-picker-content {
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+:root {
+    --rdp-cell-size: 40px;
+    --rdp-caption-font-size: 18px;
+    --rdp-background-color: #3a3a3a;
+    --rdp-accent-color: #8a7ffb;
+    --rdp-color: #e0e0e0;
+}
+
+/* --- 时间选择器和按钮的样式 --- */
+.time-picker-section {
+    border-top: 1px solid #444;
+    margin-top: 10px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.time-input {
+    background-color: #3a3a3a;
+    color: var(--rdp-color);
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.actions-section {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    /* 按钮之间的间距 */
+}
+
+.actions-section button {
+    flex-grow: 1;
+    /* 让按钮平分宽度 */
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.confirm-button {
+    background-color: var(--rdp-accent-color);
+    color: #fff;
+}
+
+.confirm-button:hover {
+    background-color: #7b6ef9;
+}
+
+.clear-button {
+    background-color: #444;
+    color: #ddd;
+}
+
+.clear-button:hover {
+    background-color: #555;
+}

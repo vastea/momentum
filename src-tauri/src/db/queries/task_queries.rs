@@ -1,6 +1,6 @@
 use crate::domain::priority::Priority;
 use crate::domain::task::Task;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use rusqlite::{params, Connection, Result as SqliteResult, ToSql};
 
 /// 创建一个新任务，并返回创建好的完整任务对象。
@@ -26,7 +26,7 @@ pub fn get_tasks_by_parent(
     parent_id: Option<i64>,
 ) -> SqliteResult<Vec<Task>> {
     let mut sql =
-        "SELECT id, title, is_completed, project_id, parent_id, priority, created_at, updated_at, \
+        "SELECT id, title, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
         (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
         FROM tasks"
             .to_string();
@@ -54,8 +54,8 @@ pub fn get_tasks_by_parent(
     // 首先按 `priority` 降序（DESC）排列，这样 3(高) > 2(中) > 1(低) > 0(无)
     // 对于优先级相同的任务，再按 `created_at` 降序排列，确保新任务在前
     sql.push_str(" ORDER BY priority DESC, created_at DESC");
-    let mut stmt = conn.prepare(&sql)?;
 
+    let mut stmt = conn.prepare(&sql)?;
     // 使用 `rusqlite::params_from_iter` 将 Vec 转换为 `rusqlite` 可接受的参数类型
     let params_slice = rusqlite::params_from_iter(params_vec.iter());
 
@@ -63,6 +63,11 @@ pub fn get_tasks_by_parent(
         let created_at_str: String = row.get("created_at")?;
         let updated_at_str: String = row.get("updated_at")?;
         let priority_val: i64 = row.get("priority")?;
+        let due_date: Option<DateTime<Utc>> = row.get::<_, Option<String>>("due_date")?.map(|s| {
+            NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                .unwrap()
+                .and_utc()
+        });
 
         Ok(Task {
             id: row.get("id")?,
@@ -72,6 +77,7 @@ pub fn get_tasks_by_parent(
             parent_id: row.get("parent_id")?,
             subtask_count: row.get("subtask_count")?,
             priority: priority_val.into(),
+            due_date,
             created_at: NaiveDateTime::parse_from_str(&created_at_str, "%Y-%m-%d %H:%M:%S")
                 .unwrap()
                 .and_utc(),
@@ -97,15 +103,22 @@ pub fn delete_task(conn: &Connection, id: i64) -> SqliteResult<usize> {
 
 /// 这是一个内部辅助函数，不对外暴露，仅用于根据 ID 获取单个任务。
 pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
-    let sql =
-        "SELECT id, title, is_completed, project_id, parent_id, priority, created_at, updated_at, \
+    let sql = 
+        "SELECT id, title, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
         (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
         FROM tasks \
         WHERE id = ?";
+
+
     conn.query_row(sql, params![id], |row| {
         let created_at_str: String = row.get("created_at")?;
         let updated_at_str: String = row.get("updated_at")?;
         let priority_val: i64 = row.get("priority")?;
+        let due_date: Option<DateTime<Utc>> = row.get::<_, Option<String>>("due_date")?.map(|s| {
+            NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                .unwrap()
+                .and_utc()
+        });
 
         Ok(Task {
             id: row.get("id")?,
@@ -115,6 +128,7 @@ pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
             parent_id: row.get("parent_id")?,
             subtask_count: row.get("subtask_count")?,
             priority: priority_val.into(),
+            due_date,
             created_at: NaiveDateTime::parse_from_str(&created_at_str, "%Y-%m-%d %H:%M:%S")
                 .unwrap()
                 .and_utc(),
@@ -133,4 +147,20 @@ pub fn update_task_priority(conn: &Connection, id: i64, priority: Priority) -> S
     // 将 Priority 枚举转换为 i64 存入数据库。
     // `priority.into()` 会自动调用为 Priority 实现的 From<Priority> for i64 Trait。
     let priority_as_i64: i64 = priority.into();
-    conn.execute(sql, params![priority_as_i64, id])}
+    conn.execute(sql, params![priority_as_i64, id])
+}
+
+/// 更新任务截止日期的函数
+pub fn update_task_due_date(
+    conn: &Connection,
+    id: i64,
+    due_date: Option<DateTime<Utc>>,
+) -> SqliteResult<usize> {
+    let sql = "UPDATE tasks SET due_date = ?1, updated_at = strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime') WHERE id = ?2";
+
+    // 将 Option<DateTime<Utc>> 转换为 rusqlite 可以理解的参数
+    let due_date_str: Option<String> =
+        due_date.map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string());
+
+    conn.execute(sql, params![due_date_str, id])
+}

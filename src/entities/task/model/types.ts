@@ -50,6 +50,12 @@ export type Task = {
     priority: Priority;
 
     /**
+     * @description 任务的截止日期 (ISO 8601 格式字符串)。
+     * 如果任务没有截止日期，则该值为 null。
+     */
+    due_date: string | null;
+
+    /**
      * @description 用于在前端存放子任务列表。
      * 这个字段用于在从后端获取数据时不存在，在前端手动填充。
      */

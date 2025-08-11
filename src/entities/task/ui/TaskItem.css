@@ -1,24 +1,34 @@
 .task-item {
     display: flex;
-    align-items: center;
-    padding: 8px 12px;
+    flex-direction: column;
+    /* 垂直布局 */
+    padding: 10px 12px;
     background-color: #333;
     border-radius: 6px;
     margin-bottom: 8px;
-    color: #fff;
+    border-left: 3px solid transparent;
+    transition: border-left-color 0.3s ease;
+}
+
+.task-main-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 .task-checkbox {
-    margin-right: 12px;
+    margin-right: 8px;
+    /* 减少间距 */
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
 }
 
 .task-title {
     flex-grow: 1;
-    /* 让标题占据所有可用空间 */
     font-size: 16px;
     transition: color 0.2s ease;
+    cursor: pointer;
 }
 
 .task-title.completed {
@@ -35,11 +45,12 @@
     padding: 0 8px;
     line-height: 1;
     opacity: 0;
-    /* 默认隐藏 */
     transition: opacity 0.2s ease;
+    margin-left: auto;
+    /* 将删除按钮推到最右侧 */
+    flex-shrink: 0;
 }
 
-/* 当鼠标悬停在任务项上时，显示删除按钮 */
 .task-item:hover .delete-button {
     opacity: 1;
 }
@@ -48,31 +59,62 @@
     color: #ff6b6b;
 }
 
-.task-content {
-    flex-grow: 1;
+/* --- 元数据行样式 --- */
+.task-metadata {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    /* 元数据项之间的间距 */
+    padding-left: 54px;
+    /* 与标题对齐（复选框+选择器+间距） */
+    margin-top: 6px;
+    /* 与标题行的间距 */
+}
+
+.metadata-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* 图标和文字的间距 */
+    font-size: 13px;
+    color: #aaa;
+}
+
+.due-date {
     cursor: pointer;
-    padding: 0 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.subtask-indicator {
-    font-size: 12px;
+/* 只让包含真实日期的 span 元素显示高亮颜色 */
+.due-date span[data-has-date="true"] {
+    color: #a29bfe;
+}
+
+/* 当没有日期时（即显示提示文字时），让 span 元素颜色变浅 */
+.due-date span[data-has-date="false"] {
     color: #888;
-    margin-top: 2px;
 }
 
-/* 默认边框样式 */
-.task-item {
-    border-left: 3px solid transparent; /* 默认是透明的 */
-    transition: border-left-color 0.3s ease;
+.due-date:hover {
+    background-color: #444;
 }
 
-/* 根据优先级设置不同的左边框颜色 */
+/* 悬停时，让 "添加截止日期" 文字颜色变亮 */
+.task-item:hover .due-date span[data-has-date="false"] {
+    color: #ddd;
+}
+
+/* 优先级边框颜色 */
 .task-item.priority-border-low {
     border-left-color: #2e86de;
 }
+
 .task-item.priority-border-medium {
     border-left-color: #f39c12;
 }
+
 .task-item.priority-border-high {
     border-left-color: #e74c3c;
 }

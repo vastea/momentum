@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 use crate::app::state::AppState;
 use crate::db::queries::task_queries;
 use crate::domain::priority::Priority;
@@ -75,11 +77,25 @@ pub async fn update_task_priority(
     id: i64,
     priority: Priority, // 前端将直接发送 "High", "Medium" 等字符串
     state: tauri::State<'_, AppState>,
-) -> Result<()> { // 成功时无需返回数据
+) -> Result<()> {
+    // 成功时无需返回数据
     // 得益于为 Priority 枚举实现的 `serde::Deserialize`，
     // Tauri 会自动将前端发来的 JSON 字符串 ("High") 解析为 Priority::High 枚举成员。
     let conn = state.db.lock().unwrap();
     // 调用刚刚创建的数据库查询函数
     task_queries::update_task_priority(&conn, id, priority)?;
+    Ok(())
+}
+
+/// Tauri 指令，用于更新一个任务的截止日期
+#[tauri::command]
+pub async fn update_task_due_date(
+    id: i64,
+    due_date: Option<DateTime<Utc>>, // 前端可以传来一个日期字符串或 null
+    state: tauri::State<'_, AppState>,
+) -> Result<()> {
+    // Tauri 的 serde 反序列化能力会自动将前端的 ISO 8601 日期字符串解析为 DateTime<Utc>
+    let conn = state.db.lock().unwrap();
+    task_queries::update_task_due_date(&conn, id, due_date)?;
     Ok(())
 }

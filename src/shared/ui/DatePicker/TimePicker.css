@@ -1,0 +1,33 @@
+.time-picker-wrapper-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 0;
+}
+
+.time-input-inline {
+    width: 45px;
+    padding: 6px;
+    font-size: 16px;
+    text-align: center;
+    background-color: #3a3a3a;
+    color: var(--rdp-color);
+    border: 1px solid #555;
+    border-radius: 4px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.time-input-inline::-webkit-outer-spin-button,
+.time-input-inline::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.time-separator-inline {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--rdp-color);
+    padding: 0 4px;
+}
