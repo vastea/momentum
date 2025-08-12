@@ -33,6 +33,7 @@ fn main() -> Result<()> {
             task_commands::get_task_by_id,
             task_commands::update_task_priority,
             task_commands::update_task_due_date,
+            task_commands::update_task_description,
             // 新增：项目相关的指令
             project_commands::create_project,
             project_commands::get_all_projects,

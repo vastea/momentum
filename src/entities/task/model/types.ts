@@ -44,6 +44,12 @@ export type Task = {
     subtask_count: number;
 
     /**
+     * @description 任务的详细描述。
+     * 如果没有描述，则为 null。
+     */
+    description: string | null;
+
+    /**
      * @description 任务的优先级。
      * 类型是定义的 Priority。
      */

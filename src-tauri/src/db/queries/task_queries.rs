@@ -26,7 +26,7 @@ pub fn get_tasks_by_parent(
     parent_id: Option<i64>,
 ) -> SqliteResult<Vec<Task>> {
     let mut sql =
-        "SELECT id, title, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
+        "SELECT id, title, description, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
         (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
         FROM tasks"
             .to_string();
@@ -72,6 +72,7 @@ pub fn get_tasks_by_parent(
         Ok(Task {
             id: row.get("id")?,
             title: row.get("title")?,
+            description: row.get("description")?,
             is_completed: row.get::<_, i32>("is_completed")? == 1,
             project_id: row.get("project_id")?,
             parent_id: row.get("parent_id")?,
@@ -104,7 +105,7 @@ pub fn delete_task(conn: &Connection, id: i64) -> SqliteResult<usize> {
 /// 这是一个内部辅助函数，不对外暴露，仅用于根据 ID 获取单个任务。
 pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
     let sql = 
-        "SELECT id, title, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
+        "SELECT id, title, description, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
         (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
         FROM tasks \
         WHERE id = ?";
@@ -123,6 +124,7 @@ pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
         Ok(Task {
             id: row.get("id")?,
             title: row.get("title")?,
+            description: row.get("description")?,
             is_completed: row.get::<_, i32>("is_completed")? == 1,
             project_id: row.get("project_id")?,
             parent_id: row.get("parent_id")?,
@@ -163,4 +165,14 @@ pub fn update_task_due_date(
         due_date.map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string());
 
     conn.execute(sql, params![due_date_str, id])
+}
+
+/// 更新任务描述的函数
+pub fn update_task_description(
+    conn: &Connection,
+    id: i64,
+    description: Option<String>,
+) -> SqliteResult<usize> {
+    let sql = "UPDATE tasks SET description = ?1, updated_at = strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime') WHERE id = ?2";
+    conn.execute(sql, params![description, id])
 }

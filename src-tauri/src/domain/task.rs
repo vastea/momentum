@@ -11,6 +11,11 @@ pub struct Task {
     pub id: i64,
     /// 任务的标题。
     pub title: String,
+
+    /// 任务的详细描述。
+    // 使用 `Option<String>` 来表示一个可以为 `None` (NULL) 的文本。
+    pub description: Option<String>,
+
     /// 任务是否已完成。
     pub is_completed: bool,
 

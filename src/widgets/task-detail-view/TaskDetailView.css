@@ -44,3 +44,26 @@
     flex-grow: 1;
     overflow-y: auto;
 }
+
+.description-section {
+    margin-bottom: 24px;
+}
+
+.description-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    border-radius: 6px;
+    color: #ddd;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    /* 允许用户垂直调整大小 */
+    resize: vertical;
+}
+
+.description-textarea:focus {
+    outline: none;
+    border-color: #8a7ffb;
+}

@@ -44,6 +44,7 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
         CREATE TABLE IF NOT EXISTS tasks (
             id              INTEGER PRIMARY KEY AUTOINCREMENT, -- 自增主键
             title           TEXT NOT NULL, -- 任务标题，不允许为空
+            description     TEXT, -- 任务描述，允许为空
             is_completed    INTEGER NOT NULL DEFAULT 0, -- 完成状态，0代表false，1代表true
             project_id      INTEGER, -- 项目id，用于关联项目
             parent_id       INTEGER, -- 父任务id，用于父子任务关联

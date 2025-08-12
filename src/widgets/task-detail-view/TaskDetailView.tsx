@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { useUiStore } from "../../stores/uiStore";
 import { useTaskById } from "../../entities/task/api/useTaskById";
 import { useTasksByParent } from "../../entities/task/api/useTasks";
 import { TaskItem } from "../../entities/task/ui/TaskItem";
 import { CreateTaskForm } from "../../features/create-task/ui/CreateTaskForm";
-import type { Task } from "../../entities/task/model/types";
+import { useUpdateTaskDescription } from "../../features/update-task-description/api/useUpdateTaskDescription";
+import { useDebounce } from "../../shared/lib/hooks/useDebounce";
 import "./TaskDetailView.css";
 
 interface TaskDetailViewProps {
@@ -14,13 +16,33 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
     const setViewingTaskId = useUiStore((state) => state.setViewingTaskId);
 
     const { data: parentTask, isLoading: isLoadingParent } = useTaskById(taskId);
-    // 在任务详情视图中，获取的是子任务，
-    // projectId 设为 null (因为后端不按它筛选子任务)，
-    // parentId 设为当前正在查看的任务ID。
     const { data: subtasks, isLoading: isLoadingSubtasks } = useTasksByParent({
-        projectId: null,
         parentId: taskId,
+        projectId: null,
     });
+    const { mutate: updateDescription } = useUpdateTaskDescription();
+
+    // 使用本地状态来管理 textarea 的输入，避免每次输入都重渲染整个组件
+    const [description, setDescription] = useState(parentTask?.description ?? "");
+    // 使用防抖技术来延迟保存操作
+    const debouncedDescription = useDebounce(description, 500); // 延迟500毫秒
+
+    // 当父任务数据加载或变化时，同步本地 description 状态
+    useEffect(() => {
+        // 只有在 textarea 没有聚焦时才同步，避免覆盖用户正在输入的内容
+        if (document.activeElement !== document.querySelector('.description-textarea')) {
+            setDescription(parentTask?.description ?? "");
+        }
+    }, [parentTask]);
+
+    // 当防抖后的 description 变化时，触发自动保存
+    useEffect(() => {
+        // 确保只在用户确实修改过内容后才保存
+        // 同时也要确保 parentTask 已经加载
+        if (parentTask && debouncedDescription !== (parentTask.description ?? "")) {
+            updateDescription({ id: taskId, description: debouncedDescription });
+        }
+    }, [debouncedDescription, taskId, parentTask, updateDescription]);
 
     return (
         <div className="task-detail-view">
@@ -37,17 +59,28 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
                 </div>
             )}
 
+            <div className="description-section">
+                <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="添加详细描述..."
+                    className="description-textarea"
+                    rows={5}
+                />
+            </div>
+
             <div className="subtask-section">
                 <h2>子任务</h2>
                 <CreateTaskForm parentId={taskId} />
 
                 <div className="subtask-list">
                     {isLoadingSubtasks && <div>正在加载子任务...</div>}
-                    {/* 为 .map() 中的参数 `subtask` 明确指定类型为 Task */}
-                    {subtasks?.map((subtask: Task) => (
+                    {subtasks?.map((subtask) => (
                         <TaskItem key={subtask.id} task={subtask} />
                     ))}
-                    {subtasks?.length === 0 && <div className="empty-state">还没有子任务</div>}
+                    {subtasks?.length === 0 && (
+                        <div className="empty-state">还没有子任务</div>
+                    )}
                 </div>
             </div>
         </div>

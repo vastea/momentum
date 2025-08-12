@@ -99,3 +99,15 @@ pub async fn update_task_due_date(
     task_queries::update_task_due_date(&conn, id, due_date)?;
     Ok(())
 }
+
+/// Tauri 指令，用于更新一个任务的描述
+#[tauri::command]
+pub async fn update_task_description(
+    id: i64,
+    description: Option<String>, // 描述可以是一个字符串，也可以是 null
+    state: tauri::State<'_, AppState>,
+) -> Result<()> {
+    let conn = state.db.lock().unwrap();
+    task_queries::update_task_description(&conn, id, description)?;
+    Ok(())
+}
