@@ -1,7 +1,7 @@
 // 在非调试模式下（即发布版），禁用 Windows 系统上的命令行窗口。
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use momentum_lib::app::commands::project_commands;
+use momentum_lib::app::commands::{attachment_commands, project_commands};
 use momentum_lib::{
     app::{self, commands::task_commands},
     error::Result,
@@ -11,6 +11,7 @@ use tauri::Manager;
 fn main() -> Result<()> {
     // 使用 `tauri::Builder` 来构建应用。
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         // `.setup()` 是一个在Tauri核心初始化后，但在窗口创建前运行的钩子函数。
         // 在这里进行数据库的初始化工作。
         .setup(|app| {
@@ -34,11 +35,15 @@ fn main() -> Result<()> {
             task_commands::update_task_priority,
             task_commands::update_task_due_date,
             task_commands::update_task_description,
-            // 新增：项目相关的指令
+            // 项目相关的指令
             project_commands::create_project,
             project_commands::get_all_projects,
             project_commands::update_project,
-            project_commands::delete_project
+            project_commands::delete_project,
+            // 附件相关的指令
+            attachment_commands::create_url_attachment,
+            attachment_commands::get_attachments_for_task,
+            attachment_commands::delete_attachment
         ])
         // `.run()` 启动事件循环并显示窗口，这是最后一步。
         .run(tauri::generate_context!())

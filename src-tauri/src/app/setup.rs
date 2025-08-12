@@ -55,6 +55,19 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
             FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
             FOREIGN KEY (parent_id) REFERENCES tasks(id) ON DELETE CASCADE
         );
+
+        /*
+         * 创建 attachments 表
+         * 这张表用于存储所有类型的附件，并通过 `task_id` 与任务关联。
+         */
+        CREATE TABLE IF NOT EXISTS attachments (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_id         INTEGER NOT NULL, -- 关联的任务ID
+            type            TEXT NOT NULL, -- 附件类型 (例如 'url', 'local_file')
+            payload         TEXT NOT NULL, -- 附件内容 (例如 https://..., /path/to/file)
+            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE -- 当任务被删除时，其所有附件也应被级联删除
+        );
         ",
     )?;
 

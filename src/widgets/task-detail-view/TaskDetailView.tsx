@@ -6,6 +6,9 @@ import { TaskItem } from "../../entities/task/ui/TaskItem";
 import { CreateTaskForm } from "../../features/create-task/ui/CreateTaskForm";
 import { useUpdateTaskDescription } from "../../features/update-task-description/api/useUpdateTaskDescription";
 import { useDebounce } from "../../shared/lib/hooks/useDebounce";
+import { useAttachments } from "../../entities/attachment/api/useAttachments";
+import { AttachmentItem } from "../../entities/attachment/ui/AttachmentItem";
+import { AddAttachmentForm } from "../../features/add-attachment/ui/AddAttachmentForm";
 import "./TaskDetailView.css";
 
 interface TaskDetailViewProps {
@@ -20,6 +23,7 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
         parentId: taskId,
         projectId: null,
     });
+    const { data: attachments, isLoading: isLoadingAttachments } = useAttachments(taskId);
     const { mutate: updateDescription } = useUpdateTaskDescription();
 
     // 使用本地状态来管理 textarea 的输入，避免每次输入都重渲染整个组件
@@ -67,6 +71,15 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
                     className="description-textarea"
                     rows={5}
                 />
+            </div>
+
+            <div className="attachments-section">
+                <h3>附件</h3>
+                <div className="attachments-list">
+                    {isLoadingAttachments && <div>加载附件中...</div>}
+                    {attachments?.map(att => <AttachmentItem key={att.id} attachment={att} />)}
+                </div>
+                <AddAttachmentForm taskId={taskId} />
             </div>
 
             <div className="subtask-section">
