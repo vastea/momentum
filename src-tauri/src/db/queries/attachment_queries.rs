@@ -52,3 +52,18 @@ fn get_attachment_by_id(conn: &Connection, id: i64) -> SqliteResult<Attachment> 
         })
     })
 }
+
+/// 为指定任务创建一个新的本地路径附件
+pub fn create_local_path_attachment(
+    conn: &Connection,
+    task_id: i64,
+    path: &str,
+) -> SqliteResult<Attachment> {
+    // 将附件类型转换为字符串 "LocalPath"
+    let attachment_type_str: &str = AttachmentType::LocalPath.into();
+    let sql = "INSERT INTO attachments (task_id, type, payload) VALUES (?1, ?2, ?3)";
+    conn.execute(sql, params![task_id, attachment_type_str, path])?;
+
+    let id = conn.last_insert_rowid();
+    get_attachment_by_id(conn, id)
+}

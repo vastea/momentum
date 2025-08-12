@@ -10,6 +10,7 @@ import { useAttachments } from "../../entities/attachment/api/useAttachments";
 import { AttachmentItem } from "../../entities/attachment/ui/AttachmentItem";
 import { AddAttachmentForm } from "../../features/add-attachment/ui/AddAttachmentForm";
 import "./TaskDetailView.css";
+import {AddLocalAttachmentButton} from "../../features/add-local-attachment/ui/AddLocalAttachmentButton.tsx";
 
 interface TaskDetailViewProps {
     taskId: number;
@@ -79,7 +80,10 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
                     {isLoadingAttachments && <div>加载附件中...</div>}
                     {attachments?.map(att => <AttachmentItem key={att.id} attachment={att} />)}
                 </div>
-                <AddAttachmentForm taskId={taskId} />
+                <div className="add-attachment-controls">
+                    <AddAttachmentForm taskId={taskId} />
+                    <AddLocalAttachmentButton taskId={taskId} />
+                </div>
             </div>
 
             <div className="subtask-section">

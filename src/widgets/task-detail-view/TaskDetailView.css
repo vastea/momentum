@@ -91,3 +91,8 @@
     flex-grow: 1; /* 让子任务列表本身也占据剩余空间 */
     overflow-y: auto; /* 在需要时显示自己的滚动条 */
 }
+
+.add-attachment-controls {
+    display: flex;
+    gap: 8px; /* 两个按钮之间的间距 */
+}

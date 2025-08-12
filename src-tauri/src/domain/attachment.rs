@@ -5,7 +5,8 @@ use ts_rs::TS;
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, TS)]
 #[ts(export)]
 pub enum AttachmentType {
-    Url,
+    Url,       // 网络 Url
+    LocalPath, // 本地文件/文件夹路径
 }
 
 /// @description 定义附件的核心数据结构。
@@ -25,7 +26,7 @@ impl From<&str> for AttachmentType {
     fn from(value: &str) -> Self {
         match value {
             "Url" => AttachmentType::Url,
-            // 如果未来有其他类型，可以在这里添加
+            "LocalPath" => AttachmentType::LocalPath,
             _ => AttachmentType::Url, // 默认或备用情况
         }
     }
@@ -36,6 +37,7 @@ impl From<AttachmentType> for &str {
     fn from(value: AttachmentType) -> Self {
         match value {
             AttachmentType::Url => "Url",
+            AttachmentType::LocalPath => "LocalPath",
         }
     }
 }

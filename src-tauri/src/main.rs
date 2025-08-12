@@ -12,6 +12,7 @@ fn main() -> Result<()> {
     // 使用 `tauri::Builder` 来构建应用。
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         // `.setup()` 是一个在Tauri核心初始化后，但在窗口创建前运行的钩子函数。
         // 在这里进行数据库的初始化工作。
         .setup(|app| {
@@ -43,7 +44,8 @@ fn main() -> Result<()> {
             // 附件相关的指令
             attachment_commands::create_url_attachment,
             attachment_commands::get_attachments_for_task,
-            attachment_commands::delete_attachment
+            attachment_commands::delete_attachment,
+            attachment_commands::create_local_path_attachment
         ])
         // `.run()` 启动事件循环并显示窗口，这是最后一步。
         .run(tauri::generate_context!())

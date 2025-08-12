@@ -33,3 +33,16 @@ pub async fn delete_attachment(id: i64, state: tauri::State<'_, AppState>) -> Re
     attachment_queries::delete_attachment(&conn, id)?;
     Ok(())
 }
+
+/// Tauri 指令，创建一个新的本地路径附件
+#[tauri::command]
+pub async fn create_local_path_attachment(
+    task_id: i64,
+    path: String,
+    state: tauri::State<'_, AppState>,
+) -> Result<Attachment> {
+    let conn = state.db.lock().unwrap();
+    let attachment =
+        attachment_queries::create_local_path_attachment(&conn, task_id, &path)?;
+    Ok(attachment)
+}
