@@ -1,3 +1,5 @@
+// src-tauri/src/main.rs
+
 // 在非调试模式下（即发布版），禁用 Windows 系统上的命令行窗口。
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
@@ -6,26 +8,76 @@ use momentum_lib::{
     app::{self, commands::task_commands},
     error::Result,
 };
-use tauri::Manager;
+
+use tauri::include_image;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    Manager,
+};
 
 fn main() -> Result<()> {
-    // 使用 `tauri::Builder` 来构建应用。
     tauri::Builder::default()
+        // 注册插件
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        // `.setup()` 是一个在Tauri核心初始化后，但在窗口创建前运行的钩子函数。
-        // 在这里进行数据库的初始化工作。
+        // `.setup()` 钩子函数，在 webview 准备好之前运行，适合进行初始化操作。
         .setup(|app| {
-            // 在 Tauri 2.0 中，setup闭包里直接拿到的是 `App`，用 `app.handle()`
-            // 来获取一个 `AppHandle`，它实现了 Manager Trait，并且可以在多线程间安全共享。
+            // 初始化数据库和应用状态
             let state = app::setup::init_database(app.handle())?;
-            // `.manage()` 方法将 AppState 实例放入 Tauri 的状态管理器中，
-            // 这样任何指令函数都可以通过 `tauri::State` 类型轻松获取它。
             app.handle().manage(state);
+
+            // 定义托盘右键菜单：显示窗口 / 退出
+            let show_item = MenuItem::with_id(app, "show", "显示窗口", true, None::<&str>)?;
+            let exit_item = MenuItem::with_id(app, "exit", "退出", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_item, &exit_item])?;
+
+            // 创建并配置托盘图标
+            TrayIconBuilder::new()
+                // 设置托盘图标
+                .icon(include_image!("icons/icon.png"))
+                // 设置鼠标悬停提示
+                .tooltip("Momentum 正在运行")
+                // 附加菜单
+                .menu(&menu)
+                // 处理菜单点击
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "show" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                    "exit" => app.exit(0),
+                    _ => {}
+                })
+                // 处理托盘图标点击
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .build(app)?;
+
             Ok(())
         })
-        // `.invoke_handler()` 负责注册所有想要从前端调用的 Rust 函数。
-        // `generate_handler!` 宏会自动收集所有列出的、标记为 `#[tauri::command]` 的函数。
+        // 注册窗口事件处理器：点击关闭按钮时仅隐藏窗口
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = window.hide();
+            }
+        })
+        // 注册所有后端 Tauri 指令
         .invoke_handler(tauri::generate_handler![
             // 任务相关的指令
             task_commands::create_task,
@@ -47,7 +99,7 @@ fn main() -> Result<()> {
             attachment_commands::delete_attachment,
             attachment_commands::create_local_path_attachment
         ])
-        // `.run()` 启动事件循环并显示窗口，这是最后一步。
+        // 启动应用
         .run(tauri::generate_context!())
         .expect("运行 Tauri 应用时出错");
 

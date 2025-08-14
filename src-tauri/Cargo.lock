@@ -2106,6 +2106,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-dialog",
  "tauri-plugin-opener",
+ "tauri-utils",
  "thiserror 2.0.12",
  "ts-rs",
 ]
