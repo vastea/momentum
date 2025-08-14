@@ -62,6 +62,12 @@ export type Task = {
     due_date: string | null;
 
     /**
+     * @description 最近一次未发送的提醒时间 (ISO 8601 格式字符串)。
+     * 如果任务没有待处理的提醒，则该值为 null。
+     */
+    next_reminder_at: string | null;
+
+    /**
      * @description 用于在前端存放子任务列表。
      * 这个字段用于在从后端获取数据时不存在，在前端手动填充。
      */

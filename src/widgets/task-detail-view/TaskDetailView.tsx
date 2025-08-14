@@ -11,6 +11,7 @@ import { AttachmentItem } from "../../entities/attachment/ui/AttachmentItem";
 import { AddAttachmentForm } from "../../features/add-attachment/ui/AddAttachmentForm";
 import "./TaskDetailView.css";
 import {AddLocalAttachmentButton} from "../../features/add-local-attachment/ui/AddLocalAttachmentButton.tsx";
+import {ReminderList} from "../reminder-list/ReminderList.tsx";
 
 interface TaskDetailViewProps {
     taskId: number;
@@ -85,6 +86,8 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
                     <AddLocalAttachmentButton taskId={taskId} />
                 </div>
             </div>
+
+            <ReminderList taskId={taskId} />
 
             <div className="subtask-section">
                 <h2>子任务</h2>

@@ -118,3 +118,8 @@
 .task-item.priority-border-high {
     border-left-color: #e74c3c;
 }
+
+.metadata-item.reminder-indicator {
+    color: #c43b3b; /* 提醒使用一种警示色 */
+    font-weight: 500;
+}

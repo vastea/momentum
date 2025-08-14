@@ -26,9 +26,15 @@ pub fn get_tasks_by_parent(
     parent_id: Option<i64>,
 ) -> SqliteResult<Vec<Task>> {
     let mut sql =
-        "SELECT id, title, description, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
-        (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
-        FROM tasks"
+        "
+        SELECT
+            t.id, t.title, t.description, t.is_completed, t.project_id, t.parent_id,
+            t.priority, t.due_date, t.created_at, t.updated_at,
+            (SELECT COUNT(*) FROM tasks AS st WHERE st.parent_id = t.id) AS subtask_count,
+            -- 使用子查询找到每个任务的最近一个未发送的提醒时间
+            (SELECT MIN(remind_at) FROM reminders r WHERE r.task_id = t.id AND r.is_sent = 0) AS next_reminder_at
+        FROM tasks t
+        "
             .to_string();
 
     let mut params_vec: Vec<Box<dyn ToSql>> = Vec::new();
@@ -68,6 +74,12 @@ pub fn get_tasks_by_parent(
                 .unwrap()
                 .and_utc()
         });
+        let next_reminder_at: Option<DateTime<Utc>> =
+            row.get::<_, Option<String>>("next_reminder_at")?.map(|s| {
+                NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                    .unwrap()
+                    .and_utc()
+            });
 
         Ok(Task {
             id: row.get("id")?,
@@ -79,6 +91,7 @@ pub fn get_tasks_by_parent(
             subtask_count: row.get("subtask_count")?,
             priority: priority_val.into(),
             due_date,
+            next_reminder_at,
             created_at: NaiveDateTime::parse_from_str(&created_at_str, "%Y-%m-%d %H:%M:%S")
                 .unwrap()
                 .and_utc(),
@@ -104,12 +117,16 @@ pub fn delete_task(conn: &Connection, id: i64) -> SqliteResult<usize> {
 
 /// 这是一个内部辅助函数，不对外暴露，仅用于根据 ID 获取单个任务。
 pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
-    let sql = 
-        "SELECT id, title, description, is_completed, project_id, parent_id, priority, due_date, created_at, updated_at, \
-        (SELECT COUNT(*) FROM tasks AS sub_tasks WHERE sub_tasks.parent_id = tasks.id) AS subtask_count \
-        FROM tasks \
-        WHERE id = ?";
-
+    let sql =
+        "
+        SELECT
+            t.id, t.title, t.description, t.is_completed, t.project_id, t.parent_id,
+            t.priority, t.due_date, t.created_at, t.updated_at,
+            (SELECT COUNT(*) FROM tasks AS st WHERE st.parent_id = t.id) AS subtask_count,
+            (SELECT MIN(remind_at) FROM reminders r WHERE r.task_id = t.id AND r.is_sent = 0) AS next_reminder_at
+        FROM tasks t
+        WHERE t.id = ?
+        ";
 
     conn.query_row(sql, params![id], |row| {
         let created_at_str: String = row.get("created_at")?;
@@ -120,6 +137,12 @@ pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
                 .unwrap()
                 .and_utc()
         });
+        let next_reminder_at: Option<DateTime<Utc>> =
+            row.get::<_, Option<String>>("next_reminder_at")?.map(|s| {
+                NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                    .unwrap()
+                    .and_utc()
+            });
 
         Ok(Task {
             id: row.get("id")?,
@@ -131,6 +154,7 @@ pub fn get_task_by_id(conn: &Connection, id: i64) -> SqliteResult<Task> {
             subtask_count: row.get("subtask_count")?,
             priority: priority_val.into(),
             due_date,
+            next_reminder_at,
             created_at: NaiveDateTime::parse_from_str(&created_at_str, "%Y-%m-%d %H:%M:%S")
                 .unwrap()
                 .and_utc(),

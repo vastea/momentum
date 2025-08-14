@@ -6,7 +6,7 @@ import { PrioritySelector } from "../../../features/update-task-priority/ui/Prio
 import { useUpdateTaskDueDate } from "../../../features/update-task-due-date/api/useUpdateTaskDueDate";
 import { useState } from "react";
 import { DatePicker } from "../../../shared/ui/DatePicker/DatePicker"; // 引入新组件
-import { Calendar, Folder, GitCommitHorizontal } from "lucide-react";
+import { Calendar, Folder, GitCommitHorizontal, Bell } from "lucide-react";
 import './TaskItem.css';
 import { formatDueDate } from "../../../shared/lib/dateUtils.ts";
 
@@ -78,6 +78,14 @@ export function TaskItem({ task, projectName }: TaskItemProps) {
                 </div>
                 {/* --- 元数据行 --- */}
                 <div className="task-metadata">
+                    {/* 显示最近提醒 */}
+                    {task.next_reminder_at && (
+                        <div className="metadata-item reminder-indicator">
+                            <Bell size={14} />
+                            <span>{formatDueDate(task.next_reminder_at)}</span>
+                        </div>
+                    )}
+
                     {/* 截止日期 */}
                     <div className="metadata-item due-date" onClick={() => setDatePickerOpen(true)}>
                         <Calendar size={14} />

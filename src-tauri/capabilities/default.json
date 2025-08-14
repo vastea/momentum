@@ -9,6 +9,7 @@
     "core:default",
     "opener:default",
     "dialog:default",
+    "notification:default",
     {
       "identifier": "opener:allow-open-path",
       "allow": [

@@ -1,0 +1,36 @@
+.reminder-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.reminder-icon {
+    margin-right: 8px;
+    color: #666;
+}
+
+.reminder-time {
+    flex-grow: 1;
+    color: #333;
+}
+
+.delete-reminder-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-reminder-button:hover {
+    background-color: #e0e0e0;
+    color: #d32f2f;
+}

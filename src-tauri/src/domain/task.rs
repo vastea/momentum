@@ -41,6 +41,10 @@ pub struct Task {
     /// 任务的截止日期。
     pub due_date: Option<DateTime<Utc>>,
 
+    /// 最近一次未发送的提醒时间 (如果有的话)
+    pub next_reminder_at: Option<DateTime<Utc>>,
+
+
     /// 使用 `chrono` 的 `DateTime<Utc>` 来确保所有时间戳都使用统一的世界协调时（UTC）。
     /// 这是处理时间的最佳实践，可以避免因用户本地时区不同而导致的数据混乱。
     pub created_at: DateTime<Utc>,

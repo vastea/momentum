@@ -68,6 +68,16 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
             created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
             FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE -- 当任务被删除时，其所有附件也应被级联删除
         );
+
+        /* --- 新增：创建 reminders 表 --- */
+        CREATE TABLE IF NOT EXISTS reminders (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_id         INTEGER NOT NULL,
+            remind_at       TEXT NOT NULL, -- 精确到秒的提醒时间 (UTC)
+            is_sent         INTEGER NOT NULL DEFAULT 0, -- 是否已发送, 0=false, 1=true
+            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
+            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+        );
         ",
     )?;
 
