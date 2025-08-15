@@ -3,7 +3,7 @@ import { invoke } from "../../../shared/api/tauri";
 
 // 定义 mutation 函数接收的参数类型
 type UpdateDueDatePayload = {
-  id: number;
+  id: bigint;
   // dueDate 可以是一个日期字符串，也可以是 null（用于清除截止日期）
   dueDate: string | null;
 };

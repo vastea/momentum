@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Project } from "../model/types";
+import { Project } from "@bindings/Project";
 
 /**
  * @description 自定义 Hook，用于从后端获取所有项目的列表。

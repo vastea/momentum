@@ -1,4 +1,4 @@
-import type { Task } from "../model/types";
+import { Task } from "@bindings/Task";
 import { useUpdateTaskStatus } from "../../../features/update-task/api/useUpdateTaskStatus";
 import { useDeleteTask } from "../../../features/delete-task/api/useDeleteTask";
 import { useUiStore } from "../../../stores/uiStore.ts";

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Attachment } from "../model/types";
+import { Attachment } from "@bindings/Attachment";
 
 /**
  * @description 根据任务ID获取其所有附件的自定义 Hook。

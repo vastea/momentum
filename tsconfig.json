@@ -16,6 +16,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@bindings/*": [
+        "./src-tauri/bindings/*"
+      ]
+    },
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

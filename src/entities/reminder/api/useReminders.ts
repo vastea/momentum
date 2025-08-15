@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Reminder } from "../model/types";
+import { Reminder } from "@bindings/Reminder";
 
 /**
  * @description 根据任务 ID 获取其所有提醒的自定义 Hook。

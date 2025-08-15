@@ -1,4 +1,4 @@
-import type { Project } from "../model/types";
+import { Project } from "@bindings/Project";
 import { useDeleteProject } from "../../../features/delete-project/api/useDeleteProject";
 import { useUiStore } from "../../../stores/uiStore"; //
 import './ProjectListItem.css';

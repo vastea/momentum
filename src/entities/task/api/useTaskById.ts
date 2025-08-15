@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Task } from "../model/types";
+import { Task } from "@bindings/Task";
 
 /**
  * @description 根据 ID 获取单个任务的详细信息。

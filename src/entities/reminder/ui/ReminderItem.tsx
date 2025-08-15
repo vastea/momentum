@@ -1,4 +1,4 @@
-import type { Reminder } from "../model/types";
+import { Reminder } from "@bindings/Reminder";
 import { useDeleteReminder } from "../../../features/delete-reminder/api/useDeleteReminder";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";

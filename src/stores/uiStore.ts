@@ -3,16 +3,16 @@ import { create } from 'zustand';
 // 定义状态的接口
 interface UiState {
     // 当前选中的项目ID，可以为 null（表示未选择任何项目，例如“收件箱”）
-    selectedProjectId: number | null;
+    selectedProjectId: bigint | null;
     // 定义一个可以修改状态的“动作” (Action)
-    setSelectedProjectId: (projectId: number | null) => void;
+    setSelectedProjectId: (projectId: bigint | null) => void;
     /**
      * @description 当前正在查看详情的任务ID。
      * 如果为 null，表示正在查看任务列表。
      * 如果为数字，表示正在查看该ID对应的任务详情。
      */
-    viewingTaskId: number | null;
-    setViewingTaskId: (taskId: number | null) => void;
+    viewingTaskId: bigint | null;
+    setViewingTaskId: (taskId: bigint | null) => void;
 }
 
 /**

@@ -33,4 +33,4 @@ chrono = { version = "0.4", features = ["serde"] }
 # 用于提供更方便、更强大的错误处理
 anyhow = "1.0"
 thiserror = "2.0"
-ts-rs = "11.0.1"
+ts-rs = { version = "11.0.1", features = ["chrono-impl"] }

@@ -5,7 +5,7 @@ import { invoke } from "../../../shared/api/tauri";
 
 // 定义 mutation 函数接收的参数类型，让代码更清晰
 type UpdateTaskPayload = {
-    id: number;
+    id: bigint;
     isCompleted: boolean;
 };
 

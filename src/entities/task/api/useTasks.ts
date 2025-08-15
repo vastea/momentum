@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 // 引入之前创建的、类型安全的 invoke 辅助函数
 import { invoke } from "../../../shared/api/tauri";
 // 引入刚刚定义的 Task 类型
-import type { Task } from "../model/types";
+import { Task } from "@bindings/Task";
 
 interface GetTasksParams {
     projectId: number | null;

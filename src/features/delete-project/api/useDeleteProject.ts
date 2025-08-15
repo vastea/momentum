@@ -5,7 +5,7 @@ export function useDeleteProject() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: number) => invoke("delete_project", { id }),
+        mutationFn: (id: bigint) => invoke("delete_project", { id }),
         onSuccess: () => {
             // 成功删除项目后，不仅要刷新项目列表，
             // 也要刷新任务列表，因为有些任务的 project_id 可能变成了 null。

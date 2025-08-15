@@ -10,7 +10,7 @@ export function useDeleteTask() {
         /**
          * @property mutationFn: 只接收要删除的任务 `id`。
          */
-        mutationFn: (id: number) => invoke("delete_task", { id }),
+        mutationFn: (id: bigint) => invoke("delete_task", { id }),
 
         /**
          * @property onSuccess: 成功删除后，也让 ['tasks'] 查询失效。

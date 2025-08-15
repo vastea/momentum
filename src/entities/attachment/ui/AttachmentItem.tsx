@@ -1,6 +1,6 @@
-import type { Attachment } from "../model/types";
+import { Attachment } from "@bindings/Attachment";
 import { useDeleteAttachment } from "../../../features/delete-attachment/api/useDeleteAttachment";
-import {FileIcon, Link, Trash2} from "lucide-react";
+import { FileIcon, Link, Trash2 } from "lucide-react";
 import { openUrl, openPath } from '@tauri-apps/plugin-opener';
 import './AttachmentItem.css';
 
@@ -19,11 +19,11 @@ export function AttachmentItem({ attachment }: AttachmentItemProps) {
     // 点击时，无论是 URL 还是本地路径，都可以用 shell.open 打开
     // 点击链接时，调用 Tauri API 在用户的默认浏览器中打开
     const handleOpen = async () => {
-        console.log(attachment.attachment_type,attachment.payload);
+        console.log(attachment.attachment_type, attachment.payload);
         try {
             if (attachment.attachment_type === 'Url') {
                 await openUrl(attachment.payload);
-            }else if (attachment.attachment_type === 'LocalPath') {
+            } else if (attachment.attachment_type === 'LocalPath') {
                 await openPath(attachment.payload);
             }
 
@@ -41,8 +41,8 @@ export function AttachmentItem({ attachment }: AttachmentItemProps) {
         <div className="attachment-item" title={attachment.payload}>
             {icon}
             <span className="attachment-payload" onClick={handleOpen}>
-        {displayText}
-      </span>
+                {displayText}
+            </span>
             <button
                 className="delete-attachment-button"
                 onClick={() => deleteAttachment(attachment.id)}

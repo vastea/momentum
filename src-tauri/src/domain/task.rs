@@ -1,11 +1,12 @@
 use crate::domain::priority::Priority;
 use chrono::{DateTime, Utc}; // 引入 `chrono` 库来处理与时区无关的时间。
-use serde::Serialize;
-// 引入 `serde` 的 `Serialize` Trait，用于将结构体序列化为 JSON。
+use serde::Serialize; // 引入 `serde` 的 `Serialize` Trait，用于将结构体序列化为 JSON。
+use ts_rs::TS;
 
 /// 核心业务模型：任务
 /// 它代表了一个待办事项的完整信息，是领域驱动设计（DDD）中的“领域对象”。
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, TS)]
+#[ts(export)]
 pub struct Task {
     /// 任务的唯一标识符，使用 `i64` 以匹配数据库的 `INTEGER` 类型，并能容纳大量数据。
     pub id: i64,
@@ -43,7 +44,6 @@ pub struct Task {
 
     /// 最近一次未发送的提醒时间 (如果有的话)
     pub next_reminder_at: Option<DateTime<Utc>>,
-
 
     /// 使用 `chrono` 的 `DateTime<Utc>` 来确保所有时间戳都使用统一的世界协调时（UTC）。
     /// 这是处理时间的最佳实践，可以避免因用户本地时区不同而导致的数据混乱。

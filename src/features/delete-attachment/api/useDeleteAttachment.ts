@@ -5,7 +5,7 @@ export function useDeleteAttachment() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: number) => invoke("delete_attachment", { id }),
+        mutationFn: (id: bigint) => invoke("delete_attachment", { id }),
         onSuccess: () => {
             // 成功删除后，需要找到这个附件属于哪个任务，
             // 并刷新该任务的附件列表。
