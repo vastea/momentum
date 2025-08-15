@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Project } from "../../../entities/project/model/types";
+import { Project } from "@bindings/Project";
 
 export function useCreateProject() {
     const queryClient = useQueryClient();

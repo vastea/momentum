@@ -4,7 +4,7 @@ import { Button } from "../../../shared/ui/Button";
 import { FolderPlus } from "lucide-react";
 
 interface AddLocalAttachmentButtonProps {
-    taskId: number;
+    taskId: bigint;
 }
 
 export function AddLocalAttachmentButton({ taskId }: AddLocalAttachmentButtonProps) {

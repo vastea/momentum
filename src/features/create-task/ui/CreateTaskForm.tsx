@@ -6,7 +6,7 @@ import './CreateTaskForm.css';
 import { useUiStore } from "../../../stores/uiStore"; // 引入 UI store
 
 interface CreateTaskFormProps {
-    parentId?: number | null;
+    parentId?: bigint | null;
 }
 
 export function CreateTaskForm({ parentId = null }: CreateTaskFormProps) {
@@ -27,13 +27,13 @@ export function CreateTaskForm({ parentId = null }: CreateTaskFormProps) {
         if (!title.trim() || isPending) return;
 
         // 调用 mutate 函数，将当前输入框的标题作为参数传给后端。
-        createTask({title, projectId: selectedProjectId, parentId },
+        createTask({ title, projectId: selectedProjectId, parentId },
             {
-            // 在成功回调中，清空输入框。
-            onSuccess: () => {
-                setTitle("");
-            },
-        });
+                // 在成功回调中，清空输入框。
+                onSuccess: () => {
+                    setTitle("");
+                },
+            });
     };
 
     return (

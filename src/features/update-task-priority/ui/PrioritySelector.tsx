@@ -1,4 +1,5 @@
-import type { Task, Priority } from "../../../entities/task/model/types";
+import { Task } from "@bindings/Task";
+import { Priority } from "@bindings/Priority";
 import { useUpdateTaskPriority } from "../api/useUpdateTaskPriority";
 import './PrioritySelector.css';
 

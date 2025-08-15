@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Priority } from "../../../entities/task/model/types";
+import { Priority } from "@bindings/Priority";
 
 // 定义 mutation 函数接收的参数类型
 type UpdatePriorityPayload = {
-    id: number;
+    id: bigint;
     priority: Priority;
 };
 

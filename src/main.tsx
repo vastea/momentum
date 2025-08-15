@@ -4,7 +4,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { AppProvider } from "./app/providers/AppProvider";
 import { TodayPage } from "./pages/TodayPage";
+import { initializeLogger } from "./shared/lib/logger";
 import "./app/styles/globals.css"; // 确保引入了新的全局样式文件
+
+initializeLogger();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

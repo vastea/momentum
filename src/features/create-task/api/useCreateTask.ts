@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
-import type { Task } from "../../../entities/task/model/types";
+import { Task } from "@bindings/Task";
 
 // 定义 mutation 函数接收的参数类型
 type CreateTaskPayload = {
     title: string;
-    projectId: number | null; // projectId 可以是 null
-    parentId: number | null;
+    projectId: bigint | null; // projectId 可以是 null
+    parentId: bigint | null;
 };
 
 /**
