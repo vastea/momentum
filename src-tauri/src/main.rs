@@ -1,7 +1,6 @@
 // 在非调试模式下（即发布版），禁用 Windows 系统上的命令行窗口。
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// --- 1. 更新这里的 use 语句 ---
 use momentum_lib::app::commands::{
     attachment_commands, project_commands, reminder_commands, task_commands,
 };
@@ -9,7 +8,6 @@ use momentum_lib::{
     app::{self}, // 确保导入了 reminder_service
     error::Result,
 };
-// --- 结束 ---
 
 use tauri::include_image;
 use tauri::{
@@ -18,12 +16,36 @@ use tauri::{
     Manager,
 };
 
+use log::LevelFilter;
+use tauri_plugin_log::{Builder as LogBuilder, Target, TargetKind};
+
 fn main() -> Result<()> {
+    let log_plugin = LogBuilder::new()
+        // 定义日志输出的目标
+        .targets([
+            // 输出到标准输出（终端）
+            Target::new(TargetKind::Stdout),
+            // 输出到应用的日志目录，文件名为 momentum.log
+            Target::new(TargetKind::LogDir {
+                file_name: Some("momentum".into()),
+            }),
+        ])
+        // 设置全局日志级别
+        // 在 debug 模式下，记录 Debug 及以上级别
+        // 在 release 模式下，只记录 Info 及以上级别
+        .level(if cfg!(debug_assertions) {
+            LevelFilter::Debug
+        } else {
+            LevelFilter::Info
+        })
+        .build();
+
     tauri::Builder::default()
         // 注册插件
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(log_plugin)
         // `.setup()` 钩子函数
         .setup(|app| {
             // 初始化数据库和应用状态

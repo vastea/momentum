@@ -1,6 +1,6 @@
 use crate::app::state::AppState;
 use crate::error::Result;
-// 导入 Manager Trait 来获取 .path() 等方法。
+use log::info;
 use rusqlite::Connection;
 use std::fs;
 use std::sync::Mutex;
@@ -8,6 +8,8 @@ use tauri::Manager;
 
 /// 初始化数据库的函数。
 pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
+    info!("[Setup] 正在初始化数据库...");
+
     // 使用 `app_handle.path()` 安全地获取应用的数据目录路径，这在不同操作系统上是不同的。
     // `.expect()` 在路径无法获取时会让程序恐慌，因为这是程序运行的必要条件。
     let app_data_dir = app_handle
@@ -23,7 +25,7 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
     // 在数据目录中定义数据库文件的名字。
     let db_path = app_data_dir.join("momentum.db");
     // 打开一个到 SQLite 数据库文件的连接。如果文件不存在，会自动创建。
-    let conn = Connection::open(db_path)?;
+    let conn = Connection::open(&db_path)?;
 
     // `.execute_batch()` 用于执行一批 SQL 语句。
     conn.execute_batch(
@@ -81,7 +83,10 @@ pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
         ",
     )?;
 
-    println!("数据库初始化成功。");
+    info!(
+        "[Setup] 数据库初始化成功, 路径: {}",
+        db_path.to_str().unwrap_or("路径无效")
+    );
 
     // 将创建好的数据库连接放入 AppState 并返回。
     Ok(AppState {

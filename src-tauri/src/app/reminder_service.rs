@@ -1,5 +1,6 @@
 use crate::app::state::AppState;
 use crate::db::queries::{reminder_queries, task_queries};
+use log::{debug, error, info};
 use std::{thread, time::Duration};
 use tauri::{Emitter, Manager};
 use tauri_plugin_notification::NotificationExt;
@@ -8,6 +9,8 @@ use tauri_plugin_notification::NotificationExt;
 pub fn start(app_handle: tauri::AppHandle) {
     // 创建一个新线程，防止阻塞 Tauri 的主线程
     thread::spawn(move || {
+        info!("[ReminderService] 后台提醒服务已启动，每 60 秒轮询一次。");
+
         // 这是一个无限循环，代表服务在持续运行
         loop {
             // --- 1. 暂停一分钟 ---
@@ -15,7 +18,7 @@ pub fn start(app_handle: tauri::AppHandle) {
             // 这定义了轮询频率，避免了不必要的 CPU 占用。
             thread::sleep(Duration::from_secs(60));
 
-            println!("[ReminderService] Tick! Checking for due reminders...");
+            debug!("[ReminderService] Tick! 检查到期的提醒...");
 
             // --- 2. 获取数据库连接 ---
             // `app_handle.state()` 用于安全地从 Tauri 的状态管理器中获取 AppState。
@@ -27,7 +30,7 @@ pub fn start(app_handle: tauri::AppHandle) {
             // 在 `if let Ok(...)` 中处理，以确保即使查询失败，线程也不会崩溃。
             if let Ok(reminders) = reminder_queries::get_due_reminders(&conn_guard) {
                 if !reminders.is_empty() {
-                    println!("[ReminderService] Found {} due reminders.", reminders.len());
+                    info!("[ReminderService] 发现 {} 个到期的提醒。", reminders.len());
                 }
 
                 let mut sent_ids = Vec::new();
@@ -51,12 +54,12 @@ pub fn start(app_handle: tauri::AppHandle) {
                             sent_ids.push(reminder.id);
                             // 记录任务id
                             affected_task_ids.push(task.id);
-                            println!("{} task notice success", task.id)
-                        } else {
-                            eprintln!(
-                                "[ReminderService] Error sending notification for reminder ID: {}",
-                                reminder.id
+                            info!(
+                                "[ReminderService] 任务 '{}' (ID: {}) 的提醒已发送。",
+                                task.title, task.id
                             );
+                        } else {
+                            error!("[ReminderService] 发送提醒失败, 提醒ID: {}", reminder.id);
                         }
                     }
                 }
@@ -66,17 +69,17 @@ pub fn start(app_handle: tauri::AppHandle) {
                 if !sent_ids.is_empty() {
                     if let Err(e) = reminder_queries::mark_reminders_as_sent(&conn_guard, &sent_ids)
                     {
-                        eprintln!("[ReminderService] Error marking reminders as sent: {}", e);
+                        error!("[ReminderService] 标记提醒为已发送时出错: {}", e);
                     } else {
-                        println!(
-                            "[ReminderService] Marked {} reminders as sent.",
+                        info!(
+                            "[ReminderService] 成功标记 {} 个提醒为已发送。",
                             sent_ids.len()
                         );
                         // 发送全局事件
                         // `emit_all` 会向所有打开的窗口广播这个事件。
                         // 事件名为 "reminder_sent"，payload 是一个包含所有受影响 task_id 的数组。
                         if let Err(e) = app_handle.emit("reminder_sent", &affected_task_ids) {
-                            eprintln!("[ReminderService] Error emitting event: {}", e);
+                            error!("[ReminderService] 广播 reminder_sent 事件时出错: {}", e);
                         }
                     }
                 }
