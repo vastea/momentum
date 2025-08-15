@@ -1,9 +1,7 @@
-// src/features/update-task/api/useUpdateTaskStatus.ts
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
+import { logger } from "../../../shared/lib/logger";
 
-// 定义 mutation 函数接收的参数类型，让代码更清晰
 type UpdateTaskPayload = {
     id: bigint;
     isCompleted: boolean;
@@ -11,25 +9,20 @@ type UpdateTaskPayload = {
 
 export function useUpdateTaskStatus() {
     const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        /**
-         * @property mutationFn: 接收一个包含 id 和 isCompleted 的对象。
-         * 调用后端的 `update_task_status` 指令来更新数据。
-         */
-        mutationFn: (payload: UpdateTaskPayload) =>
-            invoke("update_task_status", {
+    return useMutation({
+        mutationFn: (payload: UpdateTaskPayload) => {
+            logger.debug(`[API] useUpdateTaskStatus 调用 | payload: ${JSON.stringify(payload)}`);
+            return invoke("update_task_status", {
                 id: payload.id,
                 isCompleted: payload.isCompleted,
-            }),
-
-        /**
-         * @property onSuccess: 成功后，同样让 ['tasks'] 查询失效，以触发列表自动刷新。
-         */
-        onSuccess: () => {
+            });
+        },
+        onSuccess: (_, variables) => {
+            logger.info(`[API] 成功更新任务状态 | taskId: ${variables.id}, isCompleted: ${variables.isCompleted}`);
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
         },
+        onError: (error, variables) => {
+            logger.error(`[API] 更新任务状态失败 | variables: ${JSON.stringify(variables)} | error: ${JSON.stringify(error)}`);
+        }
     });
-
-    return mutation;
 }

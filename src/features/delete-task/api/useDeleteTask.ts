@@ -1,24 +1,20 @@
-// src/features/delete-task/api/useDeleteTask.ts
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
+import { logger } from "../../../shared/lib/logger";
 
 export function useDeleteTask() {
     const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        /**
-         * @property mutationFn: 只接收要删除的任务 `id`。
-         */
-        mutationFn: (id: bigint) => invoke("delete_task", { id }),
-
-        /**
-         * @property onSuccess: 成功删除后，也让 ['tasks'] 查询失效。
-         */
-        onSuccess: () => {
+    return useMutation({
+        mutationFn: (id: bigint) => {
+            logger.debug(`[API] useDeleteTask 调用 | id: ${id}`);
+            return invoke("delete_task", { id });
+        },
+        onSuccess: (_, id) => {
+            logger.info(`[API] 成功删除任务 | id: ${id}`);
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
         },
+        onError: (error, id) => {
+            logger.error(`[API] 删除任务失败 | id: ${id} | error: ${JSON.stringify(error)}`);
+        }
     });
-
-    return mutation;
 }

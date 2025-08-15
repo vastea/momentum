@@ -1,16 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
+import { logger } from "../../../shared/lib/logger";
 
 export function useDeleteProject() {
     const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: (id: bigint) => invoke("delete_project", { id }),
-        onSuccess: () => {
-            // 成功删除项目后，不仅要刷新项目列表，
-            // 也要刷新任务列表，因为有些任务的 project_id 可能变成了 null。
+        mutationFn: (id: bigint) => {
+            logger.debug(`[API] useDeleteProject 调用 | id: ${id}`);
+            return invoke("delete_project", { id });
+        },
+        onSuccess: (_, id) => {
+            logger.info(`[API] 成功删除项目 | id: ${id}`);
             queryClient.invalidateQueries({ queryKey: ["projects"] });
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
         },
+        onError: (error, id) => {
+            logger.error(`[API] 删除项目失败 | id: ${id} | error: ${JSON.stringify(error)}`);
+        }
     });
 }
