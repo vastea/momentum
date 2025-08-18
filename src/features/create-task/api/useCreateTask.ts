@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
 import { Task } from "@bindings/Task";
 import { logger } from "../../../shared/lib/logger";
+import { useAppMutation } from "../../../shared/api/useAppMutation";
 
 type CreateTaskPayload = {
     title: string;
@@ -11,7 +12,7 @@ type CreateTaskPayload = {
 
 export function useCreateTask() {
     const queryClient = useQueryClient();
-    return useMutation({
+    return useAppMutation({
         mutationFn: (payload: CreateTaskPayload) => {
             logger.debug(`[API] useCreateTask 调用 | payload: ${JSON.stringify(payload)}`);
             return invoke<Task>("create_task", {
@@ -24,8 +25,5 @@ export function useCreateTask() {
             logger.info(`[API] 成功创建任务 | data: ${JSON.stringify(data)}`);
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
         },
-        onError: (error, variables) => {
-            logger.error(`[API] 创建任务失败 | variables: ${JSON.stringify(variables)} | error: ${JSON.stringify(error)}`);
-        }
     });
 }

@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
 import { logger } from "../../../shared/lib/logger";
+import { useAppMutation } from "../../../shared/api/useAppMutation";
 
 type CreateReminderPayload = {
     taskId: bigint;
@@ -9,7 +10,7 @@ type CreateReminderPayload = {
 
 export function useCreateReminder() {
     const queryClient = useQueryClient();
-    return useMutation({
+    return useAppMutation({
         mutationFn: (payload: CreateReminderPayload) => {
             logger.debug(`[API] useCreateReminder 调用 | payload: ${JSON.stringify(payload)}`);
             return invoke("create_reminder", {
@@ -24,9 +25,6 @@ export function useCreateReminder() {
             });
             // 同时刷新任务列表，以显示 next_reminder_at
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
-        },
-        onError: (error, variables) => {
-            logger.error(`[API] 创建提醒失败 | variables: ${JSON.stringify(variables)} | error: ${JSON.stringify(error)}`);
         }
     });
 }

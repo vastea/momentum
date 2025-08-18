@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
 import { logger } from "../../../shared/lib/logger";
+import { useAppMutation } from "../../../shared/api/useAppMutation";
 
 type CreateUrlAttachmentPayload = {
     taskId: bigint;
@@ -9,7 +10,7 @@ type CreateUrlAttachmentPayload = {
 
 export function useCreateUrlAttachment() {
     const queryClient = useQueryClient();
-    return useMutation({
+    return useAppMutation({
         mutationFn: (payload: CreateUrlAttachmentPayload) => {
             logger.debug(`[API] useCreateUrlAttachment 调用 | payload: ${JSON.stringify(payload)}`);
             return invoke("create_url_attachment", {
@@ -23,8 +24,5 @@ export function useCreateUrlAttachment() {
                 queryKey: ["attachments", variables.taskId],
             });
         },
-        onError: (error, variables) => {
-            logger.error(`[API] 添加URL附件失败 | variables: ${JSON.stringify(variables)} | error: ${JSON.stringify(error)}`);
-        }
     });
 }

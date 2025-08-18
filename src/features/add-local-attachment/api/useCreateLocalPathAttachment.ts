@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../../../shared/api/tauri";
 import { logger } from "../../../shared/lib/logger";
+import { useAppMutation } from "../../../shared/api/useAppMutation";
 
 type CreateLocalPathAttachmentPayload = {
     taskId: bigint;
@@ -9,7 +10,7 @@ type CreateLocalPathAttachmentPayload = {
 
 export function useCreateLocalPathAttachment() {
     const queryClient = useQueryClient();
-    return useMutation({
+    return useAppMutation({
         mutationFn: (payload: CreateLocalPathAttachmentPayload) => {
             logger.debug(`[API] useCreateLocalPathAttachment 调用 | payload: ${JSON.stringify(payload)}`);
             return invoke("create_local_path_attachment", {
@@ -23,8 +24,5 @@ export function useCreateLocalPathAttachment() {
                 queryKey: ["attachments", variables.taskId],
             });
         },
-        onError: (error, variables) => {
-            logger.error(`[API] 添加本地路径附件失败 | variables: ${JSON.stringify(variables)} | error: ${JSON.stringify(error)}`);
-        }
     });
 }
