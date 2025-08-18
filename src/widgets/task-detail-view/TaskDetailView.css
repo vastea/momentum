@@ -1,98 +1,90 @@
 .task-detail-view {
-    width: 100%;
+    padding: 24px;
+    height: 100%;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
-.detail-view-header {
-    padding-bottom: 16px;
-    border-bottom: 1px solid #444;
-    margin-bottom: 16px;
-    flex-shrink: 0; /* 防止此元素被压缩 */
+.detail-view-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #f5f5f5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .back-button {
     background: none;
-    border: 1px solid #555;
-    color: #ddd;
-    padding: 8px 12px;
-    border-radius: 5px;
+    border: none;
+    color: #a0a0a0;
     cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
 }
 
 .back-button:hover {
     background-color: #333;
 }
 
-.parent-task-info {
-    flex-shrink: 0;
-}
-
 .parent-task-info h1 {
     margin-top: 0;
-    font-size: 24px;
-}
-
-.description-section {
     margin-bottom: 24px;
-    flex-shrink: 0;
+    font-size: 28px;
+    font-weight: 600;
+    color: #f5f5f5;
 }
 
 .description-textarea {
     width: 100%;
-    box-sizing: border-box;
-    background-color: #3a3a3a;
-    border: 1px solid #555;
+    background-color: #2c2c2c;
+    border: 1px solid #444;
     border-radius: 6px;
-    color: #ddd;
-    padding: 10px;
-    font-family: inherit;
+    padding: 12px;
+    color: #e0e0e0;
     font-size: 14px;
     resize: vertical;
-}
-
-.description-textarea:focus {
-    outline: none;
-    border-color: #8a7ffb;
-}
-
-.attachments-section {
-    margin-bottom: 24px;
-    border-top: 1px solid #444;
-    padding-top: 16px;
-    flex-shrink: 0;
-}
-
-.attachments-section h3 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 16px;
-    color: #ccc;
+    box-sizing: border-box;
 }
 
 .attachments-list {
     margin-bottom: 16px;
 }
 
-.subtask-section {
-    flex-grow: 1; /* 让子任务区域占据所有剩余空间 */
+.add-attachment-controls {
     display: flex;
-    flex-direction: column;
-    /* 确保 flex 容器能正确计算溢出 */
-    min-height: 0;
+    gap: 0;
 }
 
-.subtask-section h2 {
-    margin-top: 0;
-    flex-shrink: 0;
+.add-attachment-controls form {
+    display: flex;
+    flex-grow: 1;
+}
+
+.add-attachment-controls input {
+    border-radius: 6px 0 0 6px;
+}
+
+.add-attachment-controls form button {
+    border-radius: 0;
+    border-left-width: 0;
+}
+
+.add-attachment-controls>button {
+    border-radius: 0 6px 6px 0;
 }
 
 .subtask-list {
-    flex-grow: 1; /* 让子任务列表本身也占据剩余空间 */
-    overflow-y: auto; /* 在需要时显示自己的滚动条 */
+    margin-top: 16px;
 }
 
-.add-attachment-controls {
-    display: flex;
-    gap: 8px; /* 两个按钮之间的间距 */
+.empty-state {
+    color: #777;
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
 }

@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CreateTaskForm } from "../features/create-task/ui/CreateTaskForm";
 import { TaskList } from "../widgets/task-list/TaskList";
 import { ProjectList } from "../widgets/project-list/ProjectList";
+import { useUiStore } from "../stores/uiStore";
 import './TodayPage.css';
 
 /**
@@ -14,6 +15,8 @@ import './TodayPage.css';
 export function TodayPage() {
     // 获取 queryClient 实例
     const queryClient = useQueryClient();
+    const viewingTaskId = useUiStore((state) => state.viewingTaskId);
+
 
     // 使用 useEffect 设置事件监听器
     useEffect(() => {
@@ -44,7 +47,8 @@ export function TodayPage() {
                 <ProjectList />
             </aside>
             <main className="main-content">
-                <CreateTaskForm />
+                {/* 只有当没有在查看任务详情时 (viewingTaskId 为 null)，才显示创建任务的表单 */}
+                {!viewingTaskId && <CreateTaskForm />}
                 <TaskList />
             </main>
         </div>

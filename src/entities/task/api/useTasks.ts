@@ -5,8 +5,8 @@ import { invoke } from "../../../shared/api/tauri";
 import { Task } from "@bindings/Task";
 
 interface GetTasksParams {
-    projectId: number | null;
-    parentId: number | null;
+    projectId: bigint | null;
+    parentId: bigint | null;
 }
 
 /**

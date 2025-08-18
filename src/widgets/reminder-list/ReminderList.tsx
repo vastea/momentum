@@ -1,18 +1,16 @@
-import { useReminders } from "../../entities/reminder/api/useReminders";
 import { ReminderItem } from "../../entities/reminder/ui/ReminderItem";
 import { AddReminderForm } from "../../features/create-reminder/ui/AddReminderForm";
-import './ReminderList.css';
+import { Reminder } from "@bindings/Reminder";
 
 interface ReminderListProps {
-    taskId: number;
+    taskId: bigint;
+    reminders: Reminder[] | undefined;
+    isLoading: boolean;
 }
-
-export function ReminderList({ taskId }: ReminderListProps) {
-    const { data: reminders, isLoading } = useReminders(taskId);
+export function ReminderList({ taskId, reminders, isLoading }: ReminderListProps) {
 
     return (
-        <div className="reminders-section">
-            <h3>提醒</h3>
+        <>
             <div className="reminders-list">
                 {isLoading && <div>加载中...</div>}
                 {reminders?.map((reminder) => (
@@ -20,6 +18,6 @@ export function ReminderList({ taskId }: ReminderListProps) {
                 ))}
             </div>
             <AddReminderForm taskId={taskId} />
-        </div>
+        </>
     );
 }

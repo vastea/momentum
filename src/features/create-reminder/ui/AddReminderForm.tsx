@@ -6,7 +6,7 @@ import { Button } from "../../../shared/ui/Button";
 import './AddReminderForm.css';
 
 interface AddReminderFormProps {
-    taskId: number;
+    taskId: bigint;
 }
 
 export function AddReminderForm({ taskId }: AddReminderFormProps) {

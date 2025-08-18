@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useCreateUrlAttachment } from "../api/useCreateUrlAttachment";
 import { Input } from "../../../shared/ui/Input";
 import { Button } from "../../../shared/ui/Button";
+import { Link } from "lucide-react";
 
 interface AddAttachmentFormProps {
-    taskId: number;
+    taskId: bigint;
 }
 
 export function AddAttachmentForm({ taskId }: AddAttachmentFormProps) {
@@ -33,8 +34,8 @@ export function AddAttachmentForm({ taskId }: AddAttachmentFormProps) {
                 disabled={isPending}
                 style={{ flexGrow: 1, borderRadius: "4px 0 0 4px" }}
             />
-            <Button type="submit" disabled={isPending} style={{ borderRadius: "0 4px 4px 0" }}>
-                添加
+            <Button type="submit" disabled={isPending} title="添加网络链接">
+                <Link size={18} />
             </Button>
         </form>
     );

@@ -1,0 +1,22 @@
+.section-container {
+    /* 定义了区块之间的上边距，作为分隔 */
+    margin-top: 24px;
+    /* 定义了区块顶部的分割线 */
+    padding-top: 24px;
+    border-top: 1px solid #333;
+    /* 暗色主题下的分割线颜色 */
+}
+
+.section-title {
+    /* 统一区块的标题样式 */
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #e0e0e0;
+    /* 标题颜色 */
+}
+
+.section-content {
+    /* 内容区域，可以根据需要添加样式 */
+}

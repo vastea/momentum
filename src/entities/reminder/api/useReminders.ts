@@ -6,7 +6,7 @@ import { Reminder } from "@bindings/Reminder";
  * @description 根据任务 ID 获取其所有提醒的自定义 Hook。
  * @param taskId - 要获取提醒的任务的 ID。
  */
-export function useReminders(taskId: number | null) {
+export function useReminders(taskId: bigint | null) {
     return useQuery({
         queryKey: ["reminders", taskId],
         queryFn: async () => {

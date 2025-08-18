@@ -6,7 +6,7 @@ import { Attachment } from "@bindings/Attachment";
  * @description 根据任务ID获取其所有附件的自定义 Hook。
  * @param taskId - 要获取附件的任务的 ID。
  */
-export function useAttachments(taskId: number | null) {
+export function useAttachments(taskId: bigint | null) {
     return useQuery({
         /**
          * @property queryKey: 查询的唯一标识，包含了任务ID。

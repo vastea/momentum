@@ -6,7 +6,7 @@ import { Task } from "@bindings/Task";
  * @description 根据 ID 获取单个任务的详细信息。
  * @param taskId - 要获取的任务的 ID，可以是 null。
  */
-export function useTaskById(taskId: number | null) { // 允许 taskId 为 null
+export function useTaskById(taskId: bigint | null) { // 允许 taskId 为 null
     return useQuery({
         queryKey: ["tasks", taskId],
         queryFn: async () => {
