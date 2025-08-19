@@ -7,61 +7,12 @@
     box-sizing: border-box;
 }
 
-.settings-page .page-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #333;
-}
-
-.settings-page .page-header h1 {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 600;
-    color: #f5f5f5;
-}
-
-/* 复用 task-detail-view 的返回按钮样式 */
-.settings-page .back-button {
-    background-color: #3a3a3a;
-    border: none;
-    color: #e0e0e0;
-    cursor: pointer;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background-color 0.2s;
-}
-
-.settings-page .back-button:hover {
-    background-color: #4a4a4a;
-}
-
-.settings-item {
-    padding: 20px;
-    background-color: #2c2c2c;
-    border: 1px solid #333;
-    border-radius: 8px;
-}
-
-.settings-item h4 {
+.settings-page .page-content h4 {
+    /* 调整一下 Card 内部元素的样式 */
     margin-top: 0;
     margin-bottom: 8px;
     font-size: 16px;
     color: #f0f0f0;
-}
-
-.settings-item .description {
-    font-size: 13px;
-    color: #aaa;
-    margin-top: 0;
-    margin-bottom: 20px;
 }
 
 .path-display {

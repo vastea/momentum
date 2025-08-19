@@ -11,8 +11,8 @@ import { AttachmentItem } from "../../entities/attachment/ui/AttachmentItem";
 import { AddAttachmentForm } from "../../features/add-attachment/ui/AddAttachmentForm";
 import { AddLocalAttachmentButton } from "../../features/add-local-attachment/ui/AddLocalAttachmentButton";
 import { ReminderList } from "../reminder-list/ReminderList";
-import { ArrowLeft } from "lucide-react";
 import { useReminders } from "../../entities/reminder/api/useReminders";
+import { PageHeader } from "../../shared/ui/PageHeader/PageHeader";
 import TextareaAutosize from 'react-textarea-autosize';
 import * as Tabs from '@radix-ui/react-tabs';
 
@@ -48,13 +48,10 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
 
     return (
         <div className="task-detail-view">
-            <div className="detail-view-header">
-                <button onClick={() => showTaskList(null)} className="back-button" title="返回列表">
-                    <ArrowLeft size={20} />
-                </button>
-                {isLoadingParent && !parentTask && <h1>正在加载...</h1>}
-                {parentTask && <h1>{parentTask.title}</h1>}
-            </div>
+            <PageHeader
+                title={isLoadingParent || !parentTask ? "正在加载..." : parentTask.title}
+                onBack={() => showTaskList(null)}
+            />
 
             {parentTask && (
                 <Tabs.Root defaultValue="description" className="TabsRoot">

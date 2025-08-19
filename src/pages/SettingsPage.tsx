@@ -1,11 +1,12 @@
-import { ArrowLeft } from "lucide-react";
 import { useUiStore } from "../stores/uiStore";
+import { PageHeader } from "../shared/ui/PageHeader/PageHeader";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invoke } from "../shared/api/tauri";
 import { open } from '@tauri-apps/plugin-dialog';
 import { useAppMutation } from "../shared/api/useAppMutation";
 import { toast } from "react-hot-toast";
 import { Button } from "../shared/ui/Button";
+import { Card } from '../shared/ui/Card/Card';
 import './SettingsPage.css';
 
 export function SettingsPage() {
@@ -47,14 +48,10 @@ export function SettingsPage() {
 
     return (
         <div className="settings-page">
-            <div className="page-header">
-                <button onClick={() => showTaskList(null)} className="back-button" title="返回列表">
-                    <ArrowLeft size={20} />
-                </button>
-                <h1>设置</h1>
-            </div>
+            <PageHeader title="设置" onBack={() => showTaskList(null)} />
+
             <div className="page-content">
-                <div className="settings-item">
+                <Card>
                     <h4>数据存储</h4>
                     <p className="description">
                         你的所有任务和项目数据都存储在一个本地文件中 (momentum.db)。
@@ -66,7 +63,7 @@ export function SettingsPage() {
                     <Button onClick={handleChangeLocation} disabled={isPending}>
                         {isPending ? '正在移动...' : '更改位置...'}
                     </Button>
-                </div>
+                </Card>
             </div>
         </div>
     );

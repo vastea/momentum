@@ -7,30 +7,6 @@
     box-sizing: border-box;
 }
 
-.detail-view-header h1 {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 600;
-    color: #f5f5f5;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.back-button {
-    background: none;
-    border: none;
-    color: #a0a0a0;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-.back-button:hover {
-    background-color: #333;
-}
-
 .parent-task-info h1 {
     margin-top: 0;
     margin-bottom: 24px;
