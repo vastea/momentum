@@ -1,17 +1,23 @@
 import { useProjects } from "../../entities/project/api/useProjects";
 import { ProjectListItem } from "../../entities/project/ui/ProjectListItem";
 import { CreateProjectForm } from "../../features/create-project/ui/CreateProjectForm";
-import { useUiStore } from "../../stores/uiStore"; // 引入 store
+import { useUiStore } from "../../stores/uiStore";
+import { Settings } from "lucide-react";
 import './ProjectList.css';
 
 export function ProjectList() {
     const { data: projects, isLoading, isError } = useProjects();
     // 从 store 中获取状态和设置方法
-    const { viewState, showTaskList } = useUiStore();
+    const { viewState, showTaskList, showSettings } = useUiStore();
 
     return (
         <div className="project-list-widget">
-            <h2 className="widget-title">项目列表</h2>
+            <div className="widget-header">
+                <h2 className="widget-title">项目列表</h2>
+                <button onClick={showSettings} className="settings-button" title="设置">
+                    <Settings size={18} />
+                </button>
+            </div>
 
             {/* 收件箱选项 */}
             <div
@@ -33,7 +39,9 @@ export function ProjectList() {
                 ))}
             </div>
 
-            <CreateProjectForm />
+            <div className="create-project-form-container">
+                <CreateProjectForm />
+            </div>
 
         </div>
     );

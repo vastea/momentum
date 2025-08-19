@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use momentum_lib::app::commands::{
-    attachment_commands, project_commands, reminder_commands, task_commands,
+    attachment_commands, project_commands, reminder_commands, settings_commands, task_commands,
 };
 use momentum_lib::{
     app::{self}, // 确保导入了 reminder_service
@@ -18,6 +18,7 @@ use tauri::{
 
 use log::LevelFilter;
 use tauri_plugin_log::{Builder as LogBuilder, Target, TargetKind};
+use tauri_plugin_store::Builder as StoreBuilder;
 
 fn main() -> Result<()> {
     let log_plugin = LogBuilder::new()
@@ -46,6 +47,7 @@ fn main() -> Result<()> {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(log_plugin)
+        .plugin(StoreBuilder::default().build())
         // `.setup()` 钩子函数
         .setup(|app| {
             // 初始化数据库和应用状态
@@ -130,6 +132,9 @@ fn main() -> Result<()> {
             reminder_commands::create_reminder,
             reminder_commands::get_reminders_for_task,
             reminder_commands::delete_reminder,
+            // 设置相关的指令
+            settings_commands::get_data_path,
+            settings_commands::set_data_path
         ])
         // 启动应用
         .run(tauri::generate_context!())

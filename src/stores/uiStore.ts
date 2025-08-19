@@ -4,13 +4,15 @@ import { logger } from '../shared/lib/logger';
 // 视图状态类型
 type ViewState =
     | { type: 'list'; projectId: bigint | null } // 列表视图，并包含当前项目ID
-    | { type: 'detail'; taskId: bigint };      // 详情视图，并包含当前任务ID
+    | { type: 'detail'; taskId: bigint }      // 详情视图，并包含当前任务ID
+    | { type: 'settings' };                 //设置视图
 
 interface UiState {
     viewState: ViewState;
     // 定义可以修改状态的“动作”
     showTaskList: (projectId: bigint | null) => void;
     showTaskDetail: (taskId: bigint) => void;
+    showSettings: () => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -25,5 +27,9 @@ export const useUiStore = create<UiState>((set) => ({
     showTaskDetail: (taskId) => {
         logger.debug(`[UI Store] 切换到详情视图: :${taskId}`);
         set({ viewState: { type: 'detail', taskId } });
+    },
+    showSettings: () => {
+        logger.debug(`[UI Store] 切换到设置视图`);
+        set({ viewState: { type: 'settings' } });
     },
 }));

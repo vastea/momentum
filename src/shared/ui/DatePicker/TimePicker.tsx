@@ -12,7 +12,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
     // --- 处理键盘输入或值变化的函数 ---
     const handleValueChange = (part: 'hour' | 'minute', val: string) => {
         let numVal = parseInt(val, 10);
-        // 如果输入不是一个有效的数字（例如用户清空了输入框），我们暂时将其视为0
+        // 如果输入不是一个有效的数字（例如用户清空了输入框），将其视为0
         if (isNaN(numVal)) {
             numVal = 0;
         }

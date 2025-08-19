@@ -10,6 +10,9 @@ pub enum Error {
 
     #[error(transparent)]
     Io(#[from] std::io::Error), // 用于包装文件 IO 错误
+
+    #[error(transparent)]
+    Store(#[from] tauri_plugin_store::Error),
 }
 
 // `pub type Result<T>` 是一个贯穿整个项目的类型别名，

@@ -1,51 +1,110 @@
 .project-list-widget {
     display: flex;
     flex-direction: column;
-    padding: 12px;
-    /* 确保这个 widget 占满其父容器（侧边栏）的全部高度 */
     height: 100%;
-    box-sizing: border-box;
 }
 
-.widget-title {
+/* 新增的头部容器样式 */
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 4px;
+    margin-bottom: 8px;
+}
+
+.widget-header .widget-title {
+    margin: 0;
     font-size: 18px;
-    color: #fff;
-    margin-top: 0;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #444;
-    /* 防止标题在 flex 布局中被压缩 */
-    flex-shrink: 0;
+    font-weight: 600;
+    color: #f0f0f0;
 }
 
-.project-list-container {
-    /* 让这个容器占据所有可用的剩余空间 */
-    flex-grow: 1;
-    overflow-y: auto;
-    /* 一个 flexbox 的小技巧，防止在某些情况下内容溢出 */
-    min-height: 0;
-}
-
-.inbox {
-    font-weight: bold;
+/* 设置按钮的新样式 */
+.settings-button {
+    background: none;
+    border: none;
+    color: #888;
     cursor: pointer;
-    padding: 10px 12px;
-    border-radius: 5px;
-    transition: background-color 0.2s ease;
-    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
-.inbox.selected {
-    background-color: #4a4a4a;
-}
-
-.inbox:hover {
+.settings-button:hover {
     background-color: #3a3a3a;
+    color: #fff;
+}
+
+/* 列表项通用样式 */
+.project-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 4px;
+    color: #ccc;
+    font-size: 16px;
+}
+
+.project-list-item:hover {
+    background-color: #3a3a3a;
+}
+
+.project-list-item.selected {
+    background-color: #4a4a4a;
+    color: #fff;
+    font-weight: 500;
+}
+
+.project-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 删除按钮样式 */
+.delete-project-button {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 0 4px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.project-list-item:hover .delete-project-button {
+    visibility: visible;
+    opacity: 1;
+}
+
+.delete-project-button:hover {
+    color: #ff6b6b;
 }
 
 .divider {
     height: 1px;
-    background-color: #444;
-    margin: 8px 0;
-    flex-shrink: 0;
+    background-color: #333;
+    margin: 12px 0;
+}
+
+.project-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* 底部创建项目表单的容器 */
+.create-project-form-container {
+    margin-top: auto;
+    padding-top: 16px;
 }

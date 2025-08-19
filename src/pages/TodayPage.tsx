@@ -9,8 +9,8 @@ import './TodayPage.css';
 import { logger } from "../shared/lib/logger";
 import { useUiStore } from "../stores/uiStore";
 import { TaskDetailView } from "../widgets/task-detail-view/TaskDetailView";
-// --- 这行是修正的关键 ---
 import { CreateTaskForm } from "../features/create-task/ui/CreateTaskForm";
+import { SettingsPage } from "./SettingsPage";
 
 export function TodayPage() {
     const queryClient = useQueryClient();
@@ -41,6 +41,9 @@ export function TodayPage() {
                 )}
                 {viewState.type === 'detail' && (
                     <TaskDetailView taskId={viewState.taskId} />
+                )}
+                {viewState.type === 'settings' && (
+                    <SettingsPage />
                 )}
             </main>
         </div>

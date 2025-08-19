@@ -1,12 +1,12 @@
-// src-tauri/src/app/setup.rs
-
 use crate::app::state::AppState;
 use crate::error::Result;
 use log::{error, info};
 use rusqlite::Connection;
 use std::fs;
+use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::Manager;
+use tauri_plugin_store::StoreExt;
 
 /// 一个辅助结构体，用于解析和排序迁移文件
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -18,14 +18,31 @@ struct Migration {
 
 pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
     info!("[Setup] 正在初始化数据库...");
-    let app_data_dir = app_handle
-        .path()
-        .app_data_dir()
-        .expect("获取应用数据目录失败");
-    if !app_data_dir.exists() {
-        fs::create_dir_all(&app_data_dir).expect("创建应用数据目录失败");
-    }
-    let db_path = app_data_dir.join("momentum.db");
+
+    // 使用 app_handle.store() 扩展方法来加载 store，这会自动处理创建和加载的逻辑
+    let store = app_handle.store("settings.json")?;
+    // store.get() 返回的是 Option<JsonValue>，直接用 if let 来处理
+    let custom_path = if let Some(path_value) = store.get("databasePath") {
+        path_value.as_str().map(PathBuf::from)
+    } else {
+        None
+    };
+    // 决定最终要使用的路径
+    let db_path = if let Some(path) = custom_path {
+        info!("[Setup] 检测到自定义数据库路径: {}", path.display());
+        path.join("momentum.db")
+    } else {
+        info!("[Setup] 未配置自定义路径，使用默认数据目录。");
+        let app_data_dir = app_handle
+            .path()
+            .app_data_dir()
+            .expect("获取应用数据目录失败");
+        if !app_data_dir.exists() {
+            fs::create_dir_all(&app_data_dir).expect("创建应用数据目录失败");
+        }
+        app_data_dir.join("momentum.db")
+    };
+
     let mut conn = Connection::open(&db_path)?;
 
     // 开启 WAL 模式以提高并发性能
@@ -51,7 +68,7 @@ fn run_migrations(conn: &mut Connection, app_handle: &tauri::AppHandle) -> Resul
 
     // 2. 读取并解析所有迁移文件
     let mut migrations = Vec::new();
-    // `tauri::path::BaseDirectory::Resource` 会定位到我们稍后在 tauri.conf.json 中配置的 resources 目录
+    // `tauri::path::BaseDirectory::Resource` 会定位到在 tauri.conf.json 中配置的 resources 目录
     let migration_dir = app_handle
         .path()
         .resolve("migrations", tauri::path::BaseDirectory::Resource)?;

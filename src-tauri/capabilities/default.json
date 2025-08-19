@@ -11,6 +11,7 @@
     "dialog:default",
     "notification:default",
     "log:default",
+    "store:default",
     {
       "identifier": "opener:allow-open-path",
       "allow": [
