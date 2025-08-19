@@ -14,9 +14,10 @@ export function CreateTaskForm({ parentId = null }: CreateTaskFormProps) {
     const [title, setTitle] = useState("");
     // 调用 useCreateTask Hook，获取执行创建操作的 `mutate` 函数。
     const { mutate: createTask, isPending } = useCreateTask();
-    // 从 store 中获取当前选中的项目ID
-    const selectedProjectId = useUiStore((state) => state.selectedProjectId);
-
+    // 只有当视图是 'list' 状态时，我们才获取 projectId，否则为 null
+    const projectId = useUiStore((state) =>
+        state.viewState.type === 'list' ? state.viewState.projectId : null
+    );
     /**
      * 表单提交时的处理函数
      */
@@ -27,13 +28,11 @@ export function CreateTaskForm({ parentId = null }: CreateTaskFormProps) {
         if (!title.trim() || isPending) return;
 
         // 调用 mutate 函数，将当前输入框的标题作为参数传给后端。
-        createTask({ title, projectId: selectedProjectId, parentId },
-            {
-                // 在成功回调中，清空输入框。
-                onSuccess: () => {
-                    setTitle("");
-                },
-            });
+        createTask({ title, projectId, parentId }, {
+            onSuccess: () => {
+                setTitle("");
+            },
+        });
     };
 
     return (

@@ -24,7 +24,7 @@ interface TaskDetailViewProps {
 }
 
 export function TaskDetailView({ taskId }: TaskDetailViewProps) {
-    const setViewingTaskId = useUiStore((state) => state.setViewingTaskId);
+    const showTaskList = useUiStore((state) => state.showTaskList);
     const { data: parentTask, isLoading: isLoadingParent } = useTaskById(taskId);
     const { data: subtasks, isLoading: isLoadingSubtasks } = useTasksByParent({ parentId: taskId, projectId: null });
     const { data: attachments, isLoading: isLoadingAttachments } = useAttachments(taskId);
@@ -49,7 +49,7 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
     return (
         <div className="task-detail-view">
             <div className="detail-view-header">
-                <button onClick={() => setViewingTaskId(null)} className="back-button" title="返回列表">
+                <button onClick={() => showTaskList(null)} className="back-button" title="返回列表">
                     <ArrowLeft size={20} />
                 </button>
                 {isLoadingParent && !parentTask && <h1>正在加载...</h1>}

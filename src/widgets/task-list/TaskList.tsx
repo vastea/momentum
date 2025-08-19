@@ -1,18 +1,19 @@
 import { useTasksByParent } from "../../entities/task/api/useTasks";
 import { TaskItem } from "../../entities/task/ui/TaskItem";
-import { useUiStore } from "../../stores/uiStore";
-import { TaskDetailView } from "../task-detail-view/TaskDetailView";
 import { useProjects } from "../../entities/project/api/useProjects";
 import './TaskList.css';
 import React from "react";
 
-export function TaskList() {
-    const { selectedProjectId, viewingTaskId } = useUiStore();
+interface TaskListProps {
+    projectId: bigint | null;
+}
+
+export function TaskList({ projectId }: TaskListProps) {
 
     // 在任务列表视图中，获取的是顶级任务 (parentId: null)，
     // 并根据当前选中的项目 (selectedProjectId) 进行筛选。
     const { data: tasks, isLoading, isError, error } = useTasksByParent({
-        projectId: selectedProjectId,
+        projectId: projectId,
         parentId: null, // 只获取顶级任务
     });
 
@@ -25,10 +26,6 @@ export function TaskList() {
         if (!projects) return new Map();
         return new Map(projects.map(p => [p.id, p.name]));
     }, [projects]);
-
-    if (viewingTaskId) {
-        return <TaskDetailView taskId={viewingTaskId} />;
-    }
 
     if (isError) {
         return <div>加载任务失败: {error.message}</div>;

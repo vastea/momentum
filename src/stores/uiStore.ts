@@ -1,30 +1,29 @@
 import { create } from 'zustand';
+import { logger } from '../shared/lib/logger';
 
-// 定义状态的接口
+// 视图状态类型
+type ViewState =
+    | { type: 'list'; projectId: bigint | null } // 列表视图，并包含当前项目ID
+    | { type: 'detail'; taskId: bigint };      // 详情视图，并包含当前任务ID
+
 interface UiState {
-    // 当前选中的项目ID，可以为 null（表示未选择任何项目，例如“收件箱”）
-    selectedProjectId: bigint | null;
-    // 定义一个可以修改状态的“动作” (Action)
-    setSelectedProjectId: (projectId: bigint | null) => void;
-    /**
-     * @description 当前正在查看详情的任务ID。
-     * 如果为 null，表示正在查看任务列表。
-     * 如果为数字，表示正在查看该ID对应的任务详情。
-     */
-    viewingTaskId: bigint | null;
-    setViewingTaskId: (taskId: bigint | null) => void;
+    viewState: ViewState;
+    // 定义可以修改状态的“动作”
+    showTaskList: (projectId: bigint | null) => void;
+    showTaskDetail: (taskId: bigint) => void;
 }
 
-/**
- * 创建一个用于管理全局 UI 状态的 Zustand store
- */
 export const useUiStore = create<UiState>((set) => ({
-    // 初始状态下，没有选中任何项目
-    selectedProjectId: null,
-    // 当调用这个函数时，它会使用新的 projectId 来更新状态
-    setSelectedProjectId: (projectId) => set({ selectedProjectId: projectId }),
+    // 初始状态
+    // 应用启动时，默认显示“收件箱”（projectId 为 null）的任务列表
+    viewState: { type: 'list', projectId: null },
 
-    // 新增状态和 action
-    viewingTaskId: null,
-    setViewingTaskId: (taskId) => set({ viewingTaskId: taskId }),
+    showTaskList: (projectId) => {
+        logger.debug(`[UI Store] 切换到列表视图: ${projectId}`);
+        set({ viewState: { type: 'list', projectId } });
+    },
+    showTaskDetail: (taskId) => {
+        logger.debug(`[UI Store] 切换到详情视图: :${taskId}`);
+        set({ viewState: { type: 'detail', taskId } });
+    },
 }));

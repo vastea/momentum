@@ -23,7 +23,7 @@ export function TaskItem({ task, projectName }: TaskItemProps) {
     const { mutate: updateStatus } = useUpdateTaskStatus();
     const { mutate: deleteTask } = useDeleteTask();
     const { mutate: updateDueDate } = useUpdateTaskDueDate();
-    const setViewingTaskId = useUiStore((state) => state.setViewingTaskId);
+    const showTaskDetail = useUiStore((state) => state.showTaskDetail);
     const [isDatePickerOpen, setDatePickerOpen] = useState(false); // 新增状态控制弹窗
 
 
@@ -69,7 +69,7 @@ export function TaskItem({ task, projectName }: TaskItemProps) {
                     {/* --- 任务标题 --- */}
                     <span
                         className={`task-title ${task.is_completed ? "completed" : ""}`}
-                        onClick={() => setViewingTaskId(task.id)}
+                        onClick={() => showTaskDetail(task.id)}
                     >
                         {task.title}
                     </span>

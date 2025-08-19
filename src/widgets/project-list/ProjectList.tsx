@@ -7,7 +7,7 @@ import './ProjectList.css';
 export function ProjectList() {
     const { data: projects, isLoading, isError } = useProjects();
     // 从 store 中获取状态和设置方法
-    const { selectedProjectId, setSelectedProjectId } = useUiStore();
+    const { viewState, showTaskList } = useUiStore();
 
     return (
         <div className="project-list-widget">
@@ -16,9 +16,9 @@ export function ProjectList() {
             {/* 收件箱选项 */}
             <div
                 // 如果 selectedProjectId 是 null，就给它 'selected' 样式
-                className={`project-list-item inbox ${selectedProjectId === null ? 'selected' : ''}`}
+                className={`project-list-item inbox ${viewState.type === 'list' && viewState.projectId === null ? 'selected' : ''}`}
                 // 点击时，将 selectedProjectId 设置为 null
-                onClick={() => setSelectedProjectId(null)}
+                onClick={() => showTaskList(null)}
             >
                 <span>收件箱</span>
             </div>
@@ -32,7 +32,7 @@ export function ProjectList() {
                     <ProjectListItem key={project.id} project={project} />
                 ))}
             </div>
-            
+
             <CreateProjectForm />
 
         </div>
