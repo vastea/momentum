@@ -1,95 +1,106 @@
+// src-tauri/src/app/setup.rs
+
 use crate::app::state::AppState;
 use crate::error::Result;
-use log::info;
+use log::{error, info};
 use rusqlite::Connection;
 use std::fs;
 use std::sync::Mutex;
 use tauri::Manager;
 
-/// 初始化数据库的函数。
+/// 一个辅助结构体，用于解析和排序迁移文件
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+struct Migration {
+    version: u32,
+    path: std::path::PathBuf,
+    sql: String,
+}
+
 pub fn init_database(app_handle: &tauri::AppHandle) -> Result<AppState> {
     info!("[Setup] 正在初始化数据库...");
-
-    // 使用 `app_handle.path()` 安全地获取应用的数据目录路径，这在不同操作系统上是不同的。
-    // `.expect()` 在路径无法获取时会让程序恐慌，因为这是程序运行的必要条件。
     let app_data_dir = app_handle
         .path()
         .app_data_dir()
         .expect("获取应用数据目录失败");
-
-    // 如果数据目录尚不存在，则递归地创建它。
     if !app_data_dir.exists() {
         fs::create_dir_all(&app_data_dir).expect("创建应用数据目录失败");
     }
-
-    // 在数据目录中定义数据库文件的名字。
     let db_path = app_data_dir.join("momentum.db");
-    // 打开一个到 SQLite 数据库文件的连接。如果文件不存在，会自动创建。
-    let conn = Connection::open(&db_path)?;
+    let mut conn = Connection::open(&db_path)?;
 
-    // `.execute_batch()` 用于执行一批 SQL 语句。
-    conn.execute_batch(
-        "
-        /* 开启 WAL (Write-Ahead Logging) 模式。
-           这极大地提高了数据库的并发性能，允许读和写同时进行而不会互相阻塞。*/
-        PRAGMA journal_mode = WAL;
+    // 开启 WAL 模式以提高并发性能
+    conn.execute_batch("PRAGMA journal_mode = WAL;")?;
 
-        /* 创建 projects 表，`IF NOT EXISTS` 确保了这条语句只在表不存在时执行，可以安全地重复运行。*/
-        CREATE TABLE IF NOT EXISTS projects (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            name            TEXT NOT NULL UNIQUE,
-            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
-            updated_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))
-        );
-
-        /* 创建 tasks 表，`IF NOT EXISTS` 确保了这条语句只在表不存在时执行，可以安全地重复运行。*/
-        CREATE TABLE IF NOT EXISTS tasks (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT, -- 自增主键
-            title           TEXT NOT NULL, -- 任务标题，不允许为空
-            description     TEXT, -- 任务描述，允许为空
-            is_completed    INTEGER NOT NULL DEFAULT 0, -- 完成状态，0代表false，1代表true
-            project_id      INTEGER, -- 项目id，用于关联项目
-            parent_id       INTEGER, -- 父任务id，用于父子任务关联
-            priority        INTEGER NOT NULL DEFAULT 0, -- 优先级，默认为 0，无优先级(最低优先级)
-            due_date        TEXT, -- 截止日期字段，允许为空
-            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')), -- 创建时间
-            updated_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),  -- 更新时间
-            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
-            FOREIGN KEY (parent_id) REFERENCES tasks(id) ON DELETE CASCADE
-        );
-
-        /*
-         * 创建 attachments 表
-         * 这张表用于存储所有类型的附件，并通过 `task_id` 与任务关联。
-         */
-        CREATE TABLE IF NOT EXISTS attachments (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            task_id         INTEGER NOT NULL, -- 关联的任务ID
-            type            TEXT NOT NULL, -- 附件类型 (例如 'url', 'local_file')
-            payload         TEXT NOT NULL, -- 附件内容 (例如 https://..., /path/to/file)
-            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
-            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE -- 当任务被删除时，其所有附件也应被级联删除
-        );
-
-        /* --- 新增：创建 reminders 表 --- */
-        CREATE TABLE IF NOT EXISTS reminders (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            task_id         INTEGER NOT NULL,
-            remind_at       TEXT NOT NULL, -- 精确到秒的提醒时间 (UTC)
-            is_sent         INTEGER NOT NULL DEFAULT 0, -- 是否已发送, 0=false, 1=true
-            created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime')),
-            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
-        );
-        ",
-    )?;
+    // --- 数据库迁移核心逻辑 ---
+    run_migrations(&mut conn, app_handle)?;
 
     info!(
-        "[Setup] 数据库初始化成功, 路径: {}",
+        "[Setup] 数据库初始化/迁移成功, 路径: {}",
         db_path.to_str().unwrap_or("路径无效")
     );
-
-    // 将创建好的数据库连接放入 AppState 并返回。
     Ok(AppState {
         db: Mutex::new(conn),
     })
+}
+
+/// 执行数据库迁移
+fn run_migrations(conn: &mut Connection, app_handle: &tauri::AppHandle) -> Result<()> {
+    // 1. 获取当前数据库版本
+    let current_version: u32 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+    info!("[DB Migration] 当前数据库版本: {}", current_version);
+
+    // 2. 读取并解析所有迁移文件
+    let mut migrations = Vec::new();
+    // `tauri::path::BaseDirectory::Resource` 会定位到我们稍后在 tauri.conf.json 中配置的 resources 目录
+    let migration_dir = app_handle
+        .path()
+        .resolve("migrations", tauri::path::BaseDirectory::Resource)?;
+
+    for entry in fs::read_dir(migration_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("sql") {
+            if let Some(file_name) = path.file_stem().and_then(|s| s.to_str()) {
+                if let Some(version_str) = file_name.split("__").next() {
+                    // 从文件名 "V1__..." 中解析出版本号 1
+                    if let Some(version) = version_str
+                        .strip_prefix('V')
+                        .and_then(|s| s.parse::<u32>().ok())
+                    {
+                        let sql = fs::read_to_string(&path)?;
+                        migrations.push(Migration { version, path, sql });
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. 按版本号从小到大排序
+    migrations.sort();
+
+    // 4. 执行所有版本号高于当前数据库版本的迁移
+    for migration in migrations {
+        if migration.version > current_version {
+            info!(
+                "[DB Migration] 正在应用迁移 V{} from {}...",
+                migration.version,
+                migration.path.display()
+            );
+            let tx = conn.transaction()?;
+
+            // 在事务中执行 SQL 脚本
+            if let Err(e) = tx.execute_batch(&migration.sql) {
+                error!("[DB Migration] 迁移 V{} 失败: {}", migration.version, e);
+                tx.rollback()?; // 失败则回滚，保证数据安全
+                return Err(e.into());
+            }
+
+            // 更新数据库版本
+            tx.execute_batch(&format!("PRAGMA user_version = {}", migration.version))?;
+            tx.commit()?; // 成功则提交事务
+            info!("[DB Migration] 成功应用迁移 V{}", migration.version);
+        }
+    }
+
+    Ok(())
 }

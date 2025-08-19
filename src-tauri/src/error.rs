@@ -1,10 +1,15 @@
 // 使用 `thiserror` 库可以方便地为自定义 Error 枚举派生标准的错误处理能力。
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    // `#[error(transparent)]` 和 `#[from]` 能优雅地将其他错误类型（如 rusqlite::Error）
-    // “包装”进自己的 Error 类型中，无需编写额外的转换代码。
+    // `#[error(transparent)]` 和 `#[from]` 能优雅地将其他错误类型“包装”进自己的 Error 类型中。
     #[error(transparent)]
     Sqlite(#[from] rusqlite::Error),
+
+    #[error(transparent)]
+    Tauri(#[from] tauri::Error), // 用于包装 Tauri 核心错误
+
+    #[error(transparent)]
+    Io(#[from] std::io::Error), // 用于包装文件 IO 错误
 }
 
 // `pub type Result<T>` 是一个贯穿整个项目的类型别名，
