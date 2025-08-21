@@ -17,6 +17,7 @@ use tauri::{
 };
 
 use log::LevelFilter;
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_log::{Builder as LogBuilder, Target, TargetKind};
 use tauri_plugin_store::Builder as StoreBuilder;
 
@@ -41,6 +42,24 @@ fn main() -> Result<()> {
         })
         .build();
 
+    let palette_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
+    let shortcut_plugin = tauri_plugin_global_shortcut::Builder::new()
+        .with_handler(move |app, shortcut, event| {
+            if shortcut == &palette_shortcut {
+                if event.state == ShortcutState::Pressed {
+                    if let Some(palette_window) = app.get_webview_window("palette") {
+                        if palette_window.is_visible().unwrap_or(false) {
+                            let _ = palette_window.hide();
+                        } else {
+                            let _ = palette_window.show();
+                            let _ = palette_window.set_focus();
+                        }
+                    }
+                }
+            }
+        })
+        .build();
+
     tauri::Builder::default()
         // 注册插件
         .plugin(tauri_plugin_opener::init())
@@ -48,8 +67,9 @@ fn main() -> Result<()> {
         .plugin(tauri_plugin_notification::init())
         .plugin(log_plugin)
         .plugin(StoreBuilder::default().build())
+        .plugin(shortcut_plugin)
         // `.setup()` 钩子函数
-        .setup(|app| {
+        .setup(move |app| {
             // 初始化数据库和应用状态
             let state = app::setup::init_database(app.handle())?;
             app.handle().manage(state);
@@ -90,22 +110,31 @@ fn main() -> Result<()> {
                 })
                 .build(app)?;
 
-            // --- 2. 启动后台提醒服务 ---
+            // 启动后台提醒服务
             let app_handle = app.handle().clone();
             std::thread::spawn(move || {
                 // 调用 reminder_service 的 start 函数
                 app::reminder_service::start(app_handle);
             });
-            // --- 结束 ---
+
+            app.global_shortcut().register(palette_shortcut)?;
 
             Ok(())
         })
         // 注册窗口事件处理器
-        .on_window_event(|window, event| {
-            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                api.prevent_close();
-                let _ = window.hide();
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                if window.label() == "main" {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
             }
+            tauri::WindowEvent::Focused(false) => {
+                if window.label() == "palette" {
+                    let _ = window.hide();
+                }
+            }
+            _ => {}
         })
         // 注册所有后端 Tauri 指令
         .invoke_handler(tauri::generate_handler![
