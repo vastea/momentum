@@ -23,7 +23,7 @@ export function TaskItem({ task, projectName }: TaskItemProps) {
     const { mutate: updateStatus } = useUpdateTaskStatus();
     const { mutate: deleteTask } = useDeleteTask();
     const { mutate: updateDueDate } = useUpdateTaskDueDate();
-    const showTaskDetail = useUiStore((state) => state.showTaskDetail);
+    const { showTaskDetail, showConfirmation } = useUiStore();
     const [isDatePickerOpen, setDatePickerOpen] = useState(false); // 新增状态控制弹窗
 
 
@@ -39,8 +39,11 @@ export function TaskItem({ task, projectName }: TaskItemProps) {
      * 当删除按钮被点击时调用的处理函数
      */
     const handleDelete = () => {
-        // 调用 deleteTask mutation，并传入任务 id
-        deleteTask(task.id);
+        showConfirmation({
+            title: '确认删除任务',
+            message: `您确定要删除任务 "${task.title}" 吗？`,
+            onConfirm: () => deleteTask(task.id),
+        });
     };
 
     // 当日期选择器的值改变时触发

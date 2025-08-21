@@ -11,6 +11,8 @@ import { useUiStore } from "../stores/uiStore";
 import { TaskDetailView } from "../widgets/task-detail-view/TaskDetailView";
 import { CreateTaskForm } from "../features/create-task/ui/CreateTaskForm";
 import { SettingsPage } from "./SettingsPage";
+import { ConfirmationDialog } from "../shared/ui/ConfirmationDialog/ConfirmationDialog";
+
 
 export function TodayPage() {
     const queryClient = useQueryClient();
@@ -46,6 +48,7 @@ export function TodayPage() {
                     <SettingsPage />
                 )}
             </main>
+            <ConfirmationDialog />
         </div>
     );
 }
