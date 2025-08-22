@@ -1,10 +1,10 @@
 name: 'Release Momentum'
 
-# 1. 触发条件：当向 release 分支推送代码时触发
+# 1. 触发条件：当推送 tag 时触发
 on:
   push:
-    branches:
-      - release
+    tags:
+      - 'v*.*.*'
 
 # 打开 GitHub Token 的写权限
 permissions:
@@ -61,8 +61,7 @@ jobs:
         with:
           # tauri-action v0 会自动处理前端构建 (beforeBuildCommand)
           # 并执行 `tauri build`，然后创建 Release 并上传
-          tagName: v__VERSION__
-          releaseName: 'Momentum v__VERSION__' 
+          releaseName: 'Momentum ${{ github.ref_name }}' 
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
