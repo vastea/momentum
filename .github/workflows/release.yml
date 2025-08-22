@@ -61,6 +61,7 @@ jobs:
         with:
           # tauri-action v0 会自动处理前端构建 (beforeBuildCommand)
           # 并执行 `tauri build`，然后创建 Release 并上传
+          tagName: ${{ github.ref_name }}
           releaseName: 'Momentum ${{ github.ref_name }}' 
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
