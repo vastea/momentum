@@ -6,6 +6,10 @@ on:
     branches:
       - release
 
+# 打开 GitHub Token 的写权限
+permissions:
+  contents: write
+
 jobs:
   publish-tauri:
     # 2. 策略：配置构建矩阵，实现跨平台构建
@@ -38,11 +42,23 @@ jobs:
           node-version: 20
           cache: 'pnpm' # 这里的缓存设置依然有效
 
-      # 7. 安装前端依赖
+      # 7-1. 安装 Ubuntu 环境依赖
+      - name: install linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+      # 7-2. 安装 Windows 环境依赖
+      - name: install WiX Toolset
+        if: matrix.platform == 'windows-latest'
+        uses: tauri-apps/wix-action@v1
+
+      # 8. 安装前端依赖
       - name: install frontend dependencies
         run: pnpm install --frozen-lockfile
       
-      # 8. 核心步骤：使用官方的 tauri-action
+      # 9. 核心步骤：使用官方的 tauri-action
       - uses: tauri-apps/tauri-action@v0
         env:
           # GitHub Token 是必需的，用于创建 Release 和上传产物
