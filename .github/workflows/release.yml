@@ -25,12 +25,16 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
 
-      # 6. 设置 Node.js 环境 (使用 pnpm)
+      # 6-1. 安装 pnpm
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+
+      # 6-2. 设置 Node.js 环境 (使用 pnpm)
       - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: 'pnpm' # 这里的缓存设置依然有效
 
       # 7. 安装前端依赖
       - name: install frontend dependencies
