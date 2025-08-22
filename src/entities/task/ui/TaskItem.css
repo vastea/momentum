@@ -1,0 +1,125 @@
+.task-item {
+    display: flex;
+    flex-direction: column;
+    /* 垂直布局 */
+    padding: 10px 12px;
+    background-color: #333;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-left: 3px solid transparent;
+    transition: border-left-color 0.3s ease;
+}
+
+.task-main-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.task-checkbox {
+    margin-right: 8px;
+    /* 减少间距 */
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.task-title {
+    flex-grow: 1;
+    font-size: 16px;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+.task-title.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.delete-button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    margin-left: auto;
+    /* 将删除按钮推到最右侧 */
+    flex-shrink: 0;
+}
+
+.task-item:hover .delete-button {
+    opacity: 1;
+}
+
+.delete-button:hover {
+    color: #ff6b6b;
+}
+
+/* --- 元数据行样式 --- */
+.task-metadata {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    /* 元数据项之间的间距 */
+    padding-left: 54px;
+    /* 与标题对齐（复选框+选择器+间距） */
+    margin-top: 6px;
+    /* 与标题行的间距 */
+}
+
+.metadata-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* 图标和文字的间距 */
+    font-size: 13px;
+    color: #aaa;
+}
+
+.due-date {
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 只让包含真实日期的 span 元素显示高亮颜色 */
+.due-date span[data-has-date="true"] {
+    color: #a29bfe;
+}
+
+/* 当没有日期时（即显示提示文字时），让 span 元素颜色变浅 */
+.due-date span[data-has-date="false"] {
+    color: #888;
+}
+
+.due-date:hover {
+    background-color: #444;
+}
+
+/* 悬停时，让 "添加截止日期" 文字颜色变亮 */
+.task-item:hover .due-date span[data-has-date="false"] {
+    color: #ddd;
+}
+
+/* 优先级边框颜色 */
+.task-item.priority-border-low {
+    border-left-color: #2e86de;
+}
+
+.task-item.priority-border-medium {
+    border-left-color: #f39c12;
+}
+
+.task-item.priority-border-high {
+    border-left-color: #e74c3c;
+}
+
+.metadata-item.reminder-indicator {
+    color: #c43b3b; /* 提醒使用一种警示色 */
+    font-weight: 500;
+}

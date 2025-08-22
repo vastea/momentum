@@ -1,0 +1,67 @@
+name: 'Release Momentum'
+
+# 1. 触发条件：当推送 tag 时触发
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# 打开 GitHub Token 的写权限
+permissions:
+  contents: write
+
+jobs:
+  publish-tauri:
+    # 2. 策略：配置构建矩阵，实现跨平台构建
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-24.04, windows-latest]
+
+    # 3. 指定运行环境
+    runs-on: ${{ matrix.platform }}
+    steps:
+      # 4. 检出代码
+      - uses: actions/checkout@v4
+
+      # 5. 设置 Rust 环境及缓存
+      - name: setup rust
+        uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+
+      # 6-1. 安装 pnpm
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # 6-2. 设置 Node.js 环境 (使用 pnpm)
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm' # 这里的缓存设置依然有效
+
+      # 7. 安装 Ubuntu 环境依赖
+      - name: install ubuntu dependencies
+        if: matrix.platform == 'ubuntu-24.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      # 8. 安装前端依赖
+      - name: install frontend dependencies
+        run: pnpm install --frozen-lockfile
+      
+      # 9. 核心步骤：使用官方的 tauri-action
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          # GitHub Token 是必需的，用于创建 Release 和上传产物
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # tauri-action v0 会自动处理前端构建 (beforeBuildCommand)
+          # 并执行 `tauri build`，然后创建 Release 并上传
+          releaseName: 'Momentum ${{ github.ref_name }}' 
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false

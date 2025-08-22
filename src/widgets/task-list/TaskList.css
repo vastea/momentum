@@ -1,0 +1,14 @@
+/* src/widgets/task-list/TaskList.css */
+.task-list-container {
+    width: 100%;
+    max-width: 600px;
+    /* 限制最大宽度，使其在宽屏上不会过宽 */
+    margin-top: 20px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #888;
+    padding: 40px;
+    font-style: italic;
+}

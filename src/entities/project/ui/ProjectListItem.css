@@ -1,0 +1,44 @@
+.project-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.project-list-item:hover {
+    background-color: #3a3a3a;
+}
+
+.project-name {
+    color: #ddd;
+}
+
+.delete-project-button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.project-list-item:hover .delete-project-button {
+    opacity: 1;
+}
+
+.delete-project-button:hover {
+    color: #ff6b6b;
+}
+
+/* 为被选中的项目添加高亮背景色 */
+.project-list-item.selected {
+    background-color: #4a4a4a;
+}

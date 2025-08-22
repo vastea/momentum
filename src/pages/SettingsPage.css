@@ -1,0 +1,37 @@
+.settings-page {
+    padding: 24px;
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.settings-page .page-content h4 {
+    /* 调整一下 Card 内部元素的样式 */
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #f0f0f0;
+}
+
+.path-display {
+    background-color: #1e1e1e;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.path-display span {
+    color: #888;
+}
+
+.path-display code {
+    color: #d0d0d0;
+    font-family: monospace;
+    word-break: break-all;
+}

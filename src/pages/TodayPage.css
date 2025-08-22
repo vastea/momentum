@@ -1,0 +1,29 @@
+.page-layout {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* 确保根布局不产生滚动条 */
+}
+
+.sidebar {
+    width: 280px;
+    background-color: #1e1e1e;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.main-content {
+    flex-grow: 1; /* 占据剩余宽度 */
+    display: flex; /* 自身也成为一个 flex 容器 */
+    flex-direction: column; /* 垂直排列其子元素 */
+    padding: 20px;
+    box-sizing: border-box;
+    height: 100vh; /* 高度占满整个视口 */
+    overflow-y: auto; /* 当内容超出视口高度时，显示垂直滚动条 */
+    min-width: 0;
+}
