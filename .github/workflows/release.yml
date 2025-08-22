@@ -28,6 +28,7 @@ jobs:
       # 6-1. 安装 pnpm
       - name: setup pnpm
         uses: pnpm/action-setup@v4
+        version: 10
 
       # 6-2. 设置 Node.js 环境 (使用 pnpm)
       - name: setup node
